@@ -18,12 +18,14 @@ public class HomeActivity extends Activity {
 
     private void initComponent() {
         ToggleButton startButton = (ToggleButton)findViewById(R.id.startButton);
+        startButton.setChecked(Utility.IsFloatServiceRunning(HomeActivity.this));
+        startButton.setBackground(getResources().getDrawable(startButton.isChecked() ? R.drawable.start_button_on_t : R.drawable.start_button_off_t));
         startButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 buttonView.setBackground(getResources().getDrawable(isChecked ? R.drawable.start_button_on_t : R.drawable.start_button_off_t));
 
-                //todo: Start/Stop Service
+                Utility.ToggleFloatService(HomeActivity.this);
             }
         });
         startButton.setOnTouchListener(new View.OnTouchListener() {
