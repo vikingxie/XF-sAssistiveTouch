@@ -1,14 +1,19 @@
 package com.viking.xfat;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
+import android.content.*;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
 public class HomeActivity extends Activity {
+    boolean firstRun = true;
+    static final String PREF_NAME = "user";
+    static final String KEY_FIRST_RUN = "first_run";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -16,6 +21,14 @@ public class HomeActivity extends Activity {
         setContentView(R.layout.home);
         initComponent();
         addAdminComp();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (!Utility.IsFloatServiceRunning(HomeActivity.this)) {
+            removeAdminComp();
+        }
+        super.onDestroy();
     }
 
     private void initComponent() {
@@ -28,6 +41,8 @@ public class HomeActivity extends Activity {
                 toggleFloatService(isChecked);
             }
         });
+
+        firstRun = getSharedPreferences(PREF_NAME, MODE_PRIVATE).getBoolean(KEY_FIRST_RUN, true);
     }
 
     private void toggleFloatService(boolean start) {
@@ -70,5 +85,35 @@ public class HomeActivity extends Activity {
         DevicePolicyManager device_policy_manager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         ComponentName admin_component = new ComponentName(this.getPackageName(), DeviceAdminReceiver.class.getName());
         device_policy_manager.removeActiveAdmin(admin_component);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        showInstruction();
+    }
+
+    private void showInstruction() {
+        if (!firstRun) {
+            return;
+        }
+
+        firstRun = false;
+        SharedPreferences.Editor editor = getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit();
+        editor.putBoolean(KEY_FIRST_RUN, firstRun);
+        editor.commit();
+
+        View layout = getLayoutInflater().inflate(R.layout.instruction, (ViewGroup)findViewById(R.id.instruction));
+        Dialog alertDialog = new AlertDialog.Builder(this).
+                setTitle(R.string.instruction).
+                setView(layout).
+                setIcon(R.drawable.icon).
+                setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).create();
+        alertDialog.show();
     }
 }

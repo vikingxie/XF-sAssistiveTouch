@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">XF\'s Assistive Touch</string>
+    <string name="instruction">Instruction</string>
+    <string name="instruction_content">
+        \nOne click: Go home
+        \nDouble click: Lock screen
+        \nLong press: Task manager
+        \n
+        \nNote: Stop service before uninstall
+        \n
+    </string>
+    <string name="ok">OK</string>
 </resources>
