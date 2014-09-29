@@ -5,12 +5,8 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.ScaleDrawable;
 import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.ToggleButton;
 
 public class HomeActivity extends Activity {
 
@@ -40,9 +36,11 @@ public class HomeActivity extends Activity {
         if (!start) {
             stopService(intent);
             removeAdminComp();
+            finish();
         } else {
             if (!Utility.IsFloatServiceRunning(HomeActivity.this)) {
                 startService(intent);
+                finish();
             }
         }
     }
