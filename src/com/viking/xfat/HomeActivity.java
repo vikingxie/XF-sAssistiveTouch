@@ -1,6 +1,8 @@
 package com.viking.xfat;
 
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ScaleDrawable;
@@ -45,5 +47,32 @@ public class HomeActivity extends Activity {
                 return false;
             }
         });
+    }
+
+    static final int RESULT_FOR_ADD_DEVICE_ADMIN = 1;
+
+    private void addAdminComp() {
+        DevicePolicyManager device_policy_manager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        ComponentName admin_component = new ComponentName(this.getPackageName(), DeviceAdminReceiver.class.getName());
+        if (!device_policy_manager.isAdminActive(admin_component)) {
+            Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, admin_component);
+            startActivityForResult(intent, RESULT_FOR_ADD_DEVICE_ADMIN);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (RESULT_FOR_ADD_DEVICE_ADMIN == requestCode) {
+            if (RESULT_OK != resultCode) {
+                finish();
+            }
+        }
+    }
+
+    private void removeAdminComp() {
+        DevicePolicyManager device_policy_manager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        ComponentName admin_component = new ComponentName(this.getPackageName(), DeviceAdminReceiver.class.getName());
+        device_policy_manager.removeActiveAdmin(admin_component);
     }
 }
