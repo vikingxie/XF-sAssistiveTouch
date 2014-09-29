@@ -1,6 +1,8 @@
 package com.viking.xfat;
 
 import android.app.ActivityManager;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 
@@ -14,15 +16,5 @@ public class Utility {
             }
         }
         return false;
-    }
-
-    public static void ToggleFloatService(Context context) {
-        Intent intent = new Intent(context, FloatService.class);
-
-        if (!IsFloatServiceRunning(context)) {
-            context.startService(intent);
-        } else {
-            context.stopService(intent);
-        }
     }
 }
