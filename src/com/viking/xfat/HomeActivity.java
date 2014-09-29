@@ -6,13 +6,12 @@ import android.app.Dialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.*;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
 public class HomeActivity extends Activity {
-    boolean firstRun = true;
-    static final String PREF_NAME = "user";
     static final String KEY_FIRST_RUN = "first_run";
 
     @Override
@@ -41,8 +40,6 @@ public class HomeActivity extends Activity {
                 toggleFloatService(isChecked);
             }
         });
-
-        firstRun = getSharedPreferences(PREF_NAME, MODE_PRIVATE).getBoolean(KEY_FIRST_RUN, true);
     }
 
     private void toggleFloatService(boolean start) {
@@ -88,32 +85,11 @@ public class HomeActivity extends Activity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        showInstruction();
-    }
-
-    private void showInstruction() {
-        if (!firstRun) {
-            return;
+    protected void onResume() {
+        super.onResume();
+        if (PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).getBoolean(KEY_FIRST_RUN, true)) {
+            PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().putBoolean(KEY_FIRST_RUN, false).commit();
+            Utility.ShowInstruction(HomeActivity.this);
         }
-
-        firstRun = false;
-        SharedPreferences.Editor editor = getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit();
-        editor.putBoolean(KEY_FIRST_RUN, firstRun);
-        editor.commit();
-
-        View layout = getLayoutInflater().inflate(R.layout.instruction, (ViewGroup)findViewById(R.id.instruction));
-        Dialog alertDialog = new AlertDialog.Builder(this).
-                setTitle(R.string.instruction).
-                setView(layout).
-                setIcon(R.drawable.icon).
-                setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).create();
-        alertDialog.show();
     }
 }
