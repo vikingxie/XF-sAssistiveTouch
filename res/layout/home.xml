@@ -18,7 +18,7 @@
             android:id="@+id/startButton"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:background="@drawable/start_button_off_t"
+            android:background="@drawable/start_button_off"
             android:textStyle="bold"
             android:singleLine="false"
             android:textOn=""
