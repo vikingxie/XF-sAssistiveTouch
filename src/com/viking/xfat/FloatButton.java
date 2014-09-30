@@ -1,5 +1,6 @@
 package com.viking.xfat;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -16,6 +17,7 @@ public class FloatButton extends ImageView {
     Drawable button_image = null;
     WindowManager.LayoutParams layout_params = null;
     WindowManager window_manager = null;
+    ValueAnimator fadeout_animation = null;
     OrientationEventListener orientation_listener = null;
 
     public FloatButton(Context context) {
@@ -25,17 +27,20 @@ public class FloatButton extends ImageView {
         window_manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         createDrawable();
         createLayoutParams();
+        createAnimation();
         setOnTouchListener(new TouchListener(context));
         orientation_listener = new OrientationListener(context);
     }
 
     public void show() {
         window_manager.addView(this, layout_params);
+        fadeout_animation.start();
         orientation_listener.enable();
     }
 
     public void hide() {
         orientation_listener.disable();
+        fadeout_animation.cancel();
         window_manager.removeView(this);
     }
 
@@ -59,6 +64,20 @@ public class FloatButton extends ImageView {
         layout_params.width = WindowManager.LayoutParams.WRAP_CONTENT;
         layout_params.height =WindowManager.LayoutParams.WRAP_CONTENT;
         layout_params.alpha = 1.0f;
+    }
+
+    private void createAnimation() {
+        ValueAnimator.setFrameDelay(50);
+        fadeout_animation = ValueAnimator.ofFloat(1.0f, button_alpha);
+        fadeout_animation.setDuration(1500);
+        fadeout_animation.setStartDelay(800);
+        fadeout_animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                layout_params.alpha = (Float) animation.getAnimatedValue();
+                window_manager.updateViewLayout(FloatButton.this, layout_params);
+            }
+        });
     }
 
     private class TouchListener implements OnTouchListener {
@@ -107,10 +126,10 @@ public class FloatButton extends ImageView {
 
             moveView((int)x, (int)y);
 
-            /*if (view_fadeout.isStarted()) {
-                view_fadeout.cancel();
+            if (fadeout_animation.isStarted()) {
+                fadeout_animation.cancel();
             }
-            view_fadeout.start();*/
+            fadeout_animation.start();
 
             translateViewLocation(x, y);
 
