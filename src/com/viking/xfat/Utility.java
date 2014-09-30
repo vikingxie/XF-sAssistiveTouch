@@ -3,8 +3,9 @@ package com.viking.xfat;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
+import android.app.admin.DevicePolicyManager;
+import android.content.*;
+import android.content.pm.ApplicationInfo;
 
 import java.lang.reflect.Field;
 
@@ -57,5 +58,44 @@ public class Utility {
     public static int PX2DIP(Context context, float pxValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
+    }
+
+    public static void GoHome(Context context) {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        context.startActivity(intent);
+    }
+
+    public static void LockScreen(Context context) {
+        ApplicationInfo info = context.getApplicationInfo();
+        if (null != info) {
+            ComponentName admin_component = new ComponentName(context.getApplicationInfo().packageName, DeviceAdminReceiver.class.getName());
+            DevicePolicyManager device_policy_manager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+            if (device_policy_manager.isAdminActive(admin_component)) {
+                device_policy_manager.lockNow();
+            }
+        }
+    }
+
+    private static final String[][] pcs = {
+            {"com.android.systemui", "com.android.systemui.recent.RecentsActivity"},
+            {"com.htc.taskmanager", "com.htc.taskmanager.MainActivity"},
+    };
+
+    public static void OpenRecentActivity(Context context) {
+        for (String[] pc : pcs) {
+            try {
+                Intent intent = new Intent("/");
+                intent.setComponent(new ComponentName(pc[0], pc[1]));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                context.startActivity(intent);
+                return;
+            } catch (ActivityNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //todo: Show customize recent app view
     }
 }
