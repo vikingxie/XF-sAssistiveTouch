@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="instruction">说明</string>
+    <string name="instruction_content">
+        \n单击: 返回主屏
+        \n双击: 锁屏
+        \n长按: 任务管理器
+        \n
+        \n注意: 卸载前先停止服务
+        \n
+    </string>
+    <string name="ok">确认</string>
+</resources>
