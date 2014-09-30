@@ -6,6 +6,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import java.lang.reflect.Field;
+
 public class Utility {
 
     public static boolean IsFloatServiceRunning(Context context) {
@@ -30,5 +32,30 @@ public class Utility {
                 }
             }).create();
         alertDialog.show();
+    }
+
+    public static int GetStatusBarHeight(Context context) {
+        int status_bar_height=0;
+
+        try {
+            Class<?> c = Class.forName("com.android.internal.R$dimen");
+            Object o = c.newInstance();
+            Field field = c.getField("status_bar_height");
+            int x = Integer.parseInt(field.get(o).toString());
+            status_bar_height = context.getResources().getDimensionPixelSize(x);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return status_bar_height;
+    }
+
+    public static int DIP2PX(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
+    public static int PX2DIP(Context context, float pxValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue / scale + 0.5f);
     }
 }
