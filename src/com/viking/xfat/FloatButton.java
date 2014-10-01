@@ -13,6 +13,7 @@ public class FloatButton extends ImageView {
     int status_bar_height = 0;
     float button_alpha = 0.25f;
     int button_height, button_width;
+    float stick_distance_x, stick_distance_y;
     float button_x = 0, button_y = 0;
     Drawable button_image = null;
     WindowManager.LayoutParams layout_params = null;
@@ -51,6 +52,8 @@ public class FloatButton extends ImageView {
         button_width = button_image.getMinimumWidth();
         button_x = button_width / 2;
         button_y = button_height / 2;
+        stick_distance_x = button_width * 1.5f;
+        stick_distance_y = button_height * 1.5f;
     }
 
     private void createLayoutParams() {
@@ -111,18 +114,18 @@ public class FloatButton extends ImageView {
             y = e2.getRawY() - dy - status_bar_height + button_height / 2;
 
             // Stick to edge
-            /*Point screen_size = new Point();
+            Point screen_size = new Point();
             window_manager.getDefaultDisplay().getSize(screen_size);
-            if (x <= stick_distance) {
+            if (x <= stick_distance_x) {
                 x = button_width / 2;
-            } else if (x >= screen_size.x - stick_distance) {
+            } else if (x >= screen_size.x - stick_distance_x) {
                 x = screen_size.x - button_width / 2;
             }
-            if (y <= stick_distance) {
+            if (y <= stick_distance_y) {
                 y = button_height / 2;
-            } else if (y >= screen_size.y - status_bar_height - stick_distance) {
+            } else if (y >= screen_size.y - status_bar_height - stick_distance_y) {
                 y = screen_size.y - status_bar_height - button_height / 2;
-            }*/
+            }
 
             moveView((int)x, (int)y);
 
@@ -229,16 +232,16 @@ public class FloatButton extends ImageView {
                 }
 
                 // Stick to edge
-                /*if (x <= stick_distance) {
-                    x = view_width / 2;
-                } else if (x >= screen_size.x - stick_distance) {
-                    x = screen_size.x - view_width / 2;
+                if (x <= stick_distance_x) {
+                    x = button_width / 2;
+                } else if (x >= screen_size.x - stick_distance_x) {
+                    x = screen_size.x - button_width / 2;
                 }
-                if (y <= stick_distance) {
-                    y = view_height / 2;
-                } else if (y >= screen_size.y - status_bar_height - stick_distance) {
-                    y = screen_size.y - status_bar_height - view_height / 2;
-                }*/
+                if (y <= stick_distance_y) {
+                    y = button_height / 2;
+                } else if (y >= screen_size.y - status_bar_height - stick_distance_y) {
+                    y = screen_size.y - status_bar_height - button_height / 2;
+                }
 
                 relocateView(x, y);
                 screen_rotation = rotation;
