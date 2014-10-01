@@ -7,7 +7,6 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.*;
 import android.widget.ImageView;
 
@@ -119,9 +118,7 @@ public class FloatButton extends ImageView {
                     fadeout_animation.start();
                 }
                 coordinateRealToVirtual(real, virtual_coordinate);
-                Log.i("XFAT", String.format("aa x: %d y:%d", real.x, real.y));
                 coordinateVirtualToReal(virtual_coordinate, real);
-                Log.i("XFAT", String.format("bb x: %d y:%d", real.x, real.y));
             }
 
             private boolean stickStep(Point real) {
@@ -165,8 +162,6 @@ public class FloatButton extends ImageView {
                 } else {
                     h_speed = 0;
                 }
-
-                //Log.i("XFAT", String.format("x:%d y:%d h:%d v:%d", real.x, real.y, h_speed, v_speed));
 
                 real.x += h_speed;
                 real.y += v_speed;
