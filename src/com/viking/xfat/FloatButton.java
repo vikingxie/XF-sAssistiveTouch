@@ -265,7 +265,7 @@ public class FloatButton extends ImageView {
         }
     }
 
-    static final int VIRTUAL_SCREEN_DIMENSION = 1000000;
+    static final double VIRTUAL_SCREEN_DIMENSION = 1000000;
 
     private void coordinateRealToVirtual(Point real, Point virtual) {
         int rotation = window_manager.getDefaultDisplay().getRotation();
@@ -275,20 +275,20 @@ public class FloatButton extends ImageView {
 
         switch (rotation) {
             case Surface.ROTATION_90:
-                virtual.x = VIRTUAL_SCREEN_DIMENSION * (frame_size.y - real.y) / frame_size.y;
-                virtual.y = VIRTUAL_SCREEN_DIMENSION * real.x / frame_size.x;
+                virtual.x = (int) ((VIRTUAL_SCREEN_DIMENSION * (frame_size.y - real.y) / frame_size.y) + 0.5f);
+                virtual.y = (int) ((VIRTUAL_SCREEN_DIMENSION * real.x / frame_size.x) + 0.5f);
                 break;
             case Surface.ROTATION_180:
-                virtual.x = VIRTUAL_SCREEN_DIMENSION * (frame_size.x - real.x) / frame_size.x;
-                virtual.y = VIRTUAL_SCREEN_DIMENSION * (frame_size.y - real.y) / frame_size.y;
+                virtual.x = (int) ((VIRTUAL_SCREEN_DIMENSION * (frame_size.x - real.x) / frame_size.x) + 0.5f);
+                virtual.y = (int) ((VIRTUAL_SCREEN_DIMENSION * (frame_size.y - real.y) / frame_size.y) + 0.5f);
                 break;
             case Surface.ROTATION_270:
-                virtual.x = VIRTUAL_SCREEN_DIMENSION * real.y / frame_size.y;
-                virtual.y = VIRTUAL_SCREEN_DIMENSION * (frame_size.x - real.x) / frame_size.x;
+                virtual.x = (int) ((VIRTUAL_SCREEN_DIMENSION * real.y / frame_size.y) + 0.5f);
+                virtual.y = (int) ((VIRTUAL_SCREEN_DIMENSION * (frame_size.x - real.x) / frame_size.x) + 0.5f);
                 break;
             default:
-                virtual.x = VIRTUAL_SCREEN_DIMENSION * real.x / frame_size.x;
-                virtual.y = VIRTUAL_SCREEN_DIMENSION * real.y / frame_size.y;
+                virtual.x = (int) ((VIRTUAL_SCREEN_DIMENSION * real.x / frame_size.x) + 0.5f);
+                virtual.y = (int) ((VIRTUAL_SCREEN_DIMENSION * real.y / frame_size.y) + 0.5f);
                 break;
         }
     }
@@ -301,20 +301,20 @@ public class FloatButton extends ImageView {
 
         switch (rotation) {
             case Surface.ROTATION_90:
-                real.x = (frame_size.x * virtual.y / VIRTUAL_SCREEN_DIMENSION);
-                real.y = (frame_size.y - frame_size.y * virtual.x / VIRTUAL_SCREEN_DIMENSION);
+                real.x = (int) ((frame_size.x * virtual.y / VIRTUAL_SCREEN_DIMENSION) + 0.5f);
+                real.y = (int) ((frame_size.y - frame_size.y * virtual.x / VIRTUAL_SCREEN_DIMENSION) + 0.5f);
                 break;
             case Surface.ROTATION_180:
-                real.x = (frame_size.x - frame_size.x * virtual.x / VIRTUAL_SCREEN_DIMENSION);
-                real.y = (frame_size.y - frame_size.y * virtual.y / VIRTUAL_SCREEN_DIMENSION);
+                real.x = (int) ((frame_size.x - frame_size.x * virtual.x / VIRTUAL_SCREEN_DIMENSION) + 0.5f);
+                real.y = (int) ((frame_size.y - frame_size.y * virtual.y / VIRTUAL_SCREEN_DIMENSION) + 0.5f);
                 break;
             case Surface.ROTATION_270:
-                real.x = (frame_size.x - frame_size.x * virtual.y / VIRTUAL_SCREEN_DIMENSION);
-                real.y = (frame_size.y * virtual.x / VIRTUAL_SCREEN_DIMENSION);
+                real.x = (int) ((frame_size.x - frame_size.x * virtual.y / VIRTUAL_SCREEN_DIMENSION) + 0.5f);
+                real.y = (int) ((frame_size.y * virtual.x / VIRTUAL_SCREEN_DIMENSION) + 0.5f);
                 break;
             default:
-                real.x = (frame_size.x * virtual.x / VIRTUAL_SCREEN_DIMENSION);
-                real.y = (frame_size.y * virtual.y / VIRTUAL_SCREEN_DIMENSION);
+                real.x = (int) ((frame_size.x * virtual.x / VIRTUAL_SCREEN_DIMENSION) + 0.5f);
+                real.y = (int) ((frame_size.y * virtual.y / VIRTUAL_SCREEN_DIMENSION) + 0.5f);
                 break;
         }
     }
