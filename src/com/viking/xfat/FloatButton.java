@@ -1,15 +1,19 @@
 package com.viking.xfat;
 
+import android.animation.TimeAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.*;
 import android.widget.ImageView;
 
 public class FloatButton extends ImageView {
+    static final long animation_frame_delay = 50; // ms
+
     int status_bar_height = 0;
     float button_alpha = 0.25f;
     int button_height, button_width;
@@ -18,8 +22,9 @@ public class FloatButton extends ImageView {
     Drawable button_image = null;
     WindowManager.LayoutParams layout_params = null;
     WindowManager window_manager = null;
-    long animation_frame_delay = 50;
     ValueAnimator fadeout_animation = null;
+    TimeAnimator stick_animation = null;
+    int stick_animation_speed = 0;
     OrientationEventListener orientation_listener = null;
 
     public FloatButton(Context context) {
@@ -36,12 +41,13 @@ public class FloatButton extends ImageView {
 
     public void show() {
         window_manager.addView(this, layout_params);
-        fadeout_animation.start();
+        stick_animation.start(); //fadeout_animation.start();
         orientation_listener.enable();
     }
 
     public void hide() {
         orientation_listener.disable();
+        stick_animation.cancel();
         fadeout_animation.cancel();
         window_manager.removeView(this);
     }
@@ -93,6 +99,81 @@ public class FloatButton extends ImageView {
                 window_manager.updateViewLayout(FloatButton.this, layout_params);
             }
         });
+
+        stick_animation_speed = Utility.DIP2PX(getContext(), 5);
+        stick_animation = new TimeAnimator();
+        stick_animation.setTimeListener(new TimeAnimator.TimeListener() {
+            Point real = new Point();
+
+            @Override
+            public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
+                coordinateVirtualToReal(virtual_coordinate, real);
+                if (stickStep(real)) {
+                    move(real, 1.0f);
+                } else {
+                    coordinateRealStickEdge(real);
+                    stick_animation.cancel();
+                    if (fadeout_animation.isStarted()) {
+                        fadeout_animation.cancel();
+                    }
+                    fadeout_animation.start();
+                }
+                coordinateRealToVirtual(real, virtual_coordinate);
+                Log.i("XFAT", String.format("aa x: %d y:%d", real.x, real.y));
+                coordinateVirtualToReal(virtual_coordinate, real);
+                Log.i("XFAT", String.format("bb x: %d y:%d", real.x, real.y));
+            }
+
+            private boolean stickStep(Point real) {
+                Point frame_size = new Point();
+                window_manager.getDefaultDisplay().getSize(frame_size);
+                frame_size.y -= status_bar_height;
+
+                if (real.x < button_width / 2 || real.x > frame_size.x - button_width / 2 ||
+                        real.y < button_height / 2 || real.y > frame_size.y - button_height / 2)
+                {
+                    return false;
+                }
+
+                int to_left, to_right, to_top, to_bottom;
+                int h_speed, v_speed;
+                int h_dis, v_dis;
+
+                to_left = real.x;
+                to_right = frame_size.x - real.x;
+                to_top = real.y;
+                to_bottom = frame_size.y - real.y;
+
+                if (to_left < to_right) {
+                    h_speed = -stick_animation_speed;
+                    h_dis = to_left;
+                } else {
+                    h_speed = stick_animation_speed;
+                    h_dis = to_right;
+                }
+
+                if (to_top < to_bottom) {
+                    v_speed = -stick_animation_speed;
+                    v_dis = to_top;
+                } else {
+                    v_speed = stick_animation_speed;
+                    v_dis = to_bottom;
+                }
+
+                if (h_dis <= v_dis) {
+                    v_speed = 0;
+                } else {
+                    h_speed = 0;
+                }
+
+                //Log.i("XFAT", String.format("x:%d y:%d h:%d v:%d", real.x, real.y, h_speed, v_speed));
+
+                real.x += h_speed;
+                real.y += v_speed;
+
+                return true;
+            }
+        });
     }
 
     private class TouchListener implements OnTouchListener {
@@ -104,6 +185,16 @@ public class FloatButton extends ImageView {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case  MotionEvent.ACTION_UP:
+                    fadeout_animation.cancel();
+                    stick_animation.start();
+                    break;
+
+                case MotionEvent.ACTION_DOWN:
+                    stick_animation.cancel();
+                    fadeout_animation.cancel();
+            }
             return gesture_detector.onTouchEvent(event);
         }
     }
@@ -129,12 +220,6 @@ public class FloatButton extends ImageView {
             coordinateRealStickEdge(real);
             move(real, 1.0f);
             coordinateRealToVirtual(real, virtual_coordinate);
-
-            if (fadeout_animation.isStarted()) {
-                fadeout_animation.cancel();
-            }
-            fadeout_animation.start();
-
             return true;
         }
 
@@ -180,7 +265,7 @@ public class FloatButton extends ImageView {
         }
     }
 
-    static final int VIRTUAL_SCREEN_DIMENSION = 100000;
+    static final int VIRTUAL_SCREEN_DIMENSION = 1000000;
 
     private void coordinateRealToVirtual(Point real, Point virtual) {
         int rotation = window_manager.getDefaultDisplay().getRotation();
@@ -229,7 +314,7 @@ public class FloatButton extends ImageView {
                 break;
             default:
                 real.x = (frame_size.x * virtual.x / VIRTUAL_SCREEN_DIMENSION);
-                real.y = frame_size.y * virtual.y / VIRTUAL_SCREEN_DIMENSION;
+                real.y = (frame_size.y * virtual.y / VIRTUAL_SCREEN_DIMENSION);
                 break;
         }
     }
