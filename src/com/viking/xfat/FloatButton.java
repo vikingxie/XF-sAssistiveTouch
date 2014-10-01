@@ -211,20 +211,20 @@ public class FloatButton extends ImageView {
 
                 switch (rotation) {
                     case Surface.ROTATION_90:
-                        x = (int) (frame_x * button_x);
-                        y = (int) (frame_y * (1.0f - button_y));
+                        x = (int) (frame_x * button_y);
+                        y = (int) (frame_y - frame_y * button_x);
                         break;
                     case Surface.ROTATION_180:
-                        x = (int) (frame_x * (1.0f - button_y));
-                        y = (int) (frame_y * (1.0f - button_x));
+                        x = (int) (frame_x - frame_x * button_x);
+                        y = (int) (frame_y - frame_y * button_y);
                         break;
                     case Surface.ROTATION_270:
-                        x = (int) (frame_x * (1.0f - button_x));
-                        y = (int) (frame_y * button_y);
+                        x = (int) (frame_x - frame_x * button_y);
+                        y = (int) (frame_y * button_x);
                         break;
                     default:
-                        x = (int) (frame_x * button_y);
-                        y = (int) (frame_y * button_x);
+                        x = (int) (frame_x * button_x);
+                        y = (int) (frame_y * button_y);
                         break;
                 }
 
