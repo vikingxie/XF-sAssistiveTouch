@@ -14,10 +14,11 @@ public class FloatButton extends ImageView {
     float button_alpha = 0.25f;
     int button_height, button_width;
     float stick_distance_x, stick_distance_y;
-    float button_x = 0, button_y = 0;
+    Point virtual_coordinate = new Point();
     Drawable button_image = null;
     WindowManager.LayoutParams layout_params = null;
     WindowManager window_manager = null;
+    long animation_frame_delay = 50;
     ValueAnimator fadeout_animation = null;
     OrientationEventListener orientation_listener = null;
 
@@ -45,15 +46,26 @@ public class FloatButton extends ImageView {
         window_manager.removeView(this);
     }
 
+    public void move(Point coordinate) {
+        layout_params.x = coordinate.x - button_width / 2;
+        layout_params.y = coordinate.y - button_height / 2;
+        window_manager.updateViewLayout(FloatButton.this, layout_params);
+    }
+
+    public void move(Point coordinate, float alpha) {
+        layout_params.x = coordinate.x - button_width / 2;
+        layout_params.y = coordinate.y - button_height / 2;
+        layout_params.alpha = alpha;
+        window_manager.updateViewLayout(FloatButton.this, layout_params);
+    }
+
     private void createDrawable() {
         button_image = getContext().getResources().getDrawable(R.drawable.icon);
         setImageDrawable(button_image);
         button_height = button_image.getMinimumHeight();
         button_width = button_image.getMinimumWidth();
-        button_x = button_width / 2;
-        button_y = button_height / 2;
-        stick_distance_x = button_width * 1.5f;
-        stick_distance_y = button_height * 1.5f;
+        stick_distance_x = button_width * 0.8f;
+        stick_distance_y = button_height * 0.8f;
     }
 
     private void createLayoutParams() {
@@ -70,7 +82,7 @@ public class FloatButton extends ImageView {
     }
 
     private void createAnimation() {
-        ValueAnimator.setFrameDelay(50);
+        ValueAnimator.setFrameDelay(animation_frame_delay);
         fadeout_animation = ValueAnimator.ofFloat(1.0f, button_alpha);
         fadeout_animation.setDuration(1500);
         fadeout_animation.setStartDelay(800);
@@ -113,64 +125,17 @@ public class FloatButton extends ImageView {
             x = e2.getRawX() - dx + button_width / 2;
             y = e2.getRawY() - dy - status_bar_height + button_height / 2;
 
-            // Stick to edge
-            Point screen_size = new Point();
-            window_manager.getDefaultDisplay().getSize(screen_size);
-            if (x <= stick_distance_x) {
-                x = button_width / 2;
-            } else if (x >= screen_size.x - stick_distance_x) {
-                x = screen_size.x - button_width / 2;
-            }
-            if (y <= stick_distance_y) {
-                y = button_height / 2;
-            } else if (y >= screen_size.y - status_bar_height - stick_distance_y) {
-                y = screen_size.y - status_bar_height - button_height / 2;
-            }
-
-            moveView((int)x, (int)y);
+            Point real = new Point((int)x, (int)y);
+            coordinateRealStickEdge(real);
+            move(real, 1.0f);
+            coordinateRealToVirtual(real, virtual_coordinate);
 
             if (fadeout_animation.isStarted()) {
                 fadeout_animation.cancel();
             }
             fadeout_animation.start();
 
-            translateViewLocation(x, y);
-
             return true;
-        }
-
-        private void moveView(int x, int y) {
-            layout_params.x = x - button_width / 2;
-            layout_params.y = y - button_height / 2;
-            layout_params.alpha = 1.0f;
-            window_manager.updateViewLayout(FloatButton.this, layout_params);
-        }
-
-        private  void translateViewLocation(float x, float y) {
-            int rotation = window_manager.getDefaultDisplay().getRotation();
-            Point screen_size = new Point();
-            window_manager.getDefaultDisplay().getSize(screen_size);
-            float frame_x = screen_size.x;
-            float frame_y = screen_size.y - status_bar_height;
-
-            switch (rotation) {
-                case Surface.ROTATION_90:
-                    button_x = (frame_y - y) / frame_y;
-                    button_y = x / frame_x;
-                    break;
-                case Surface.ROTATION_180:
-                    button_x = (frame_x - x) / frame_x;
-                    button_y = (frame_y - y) / frame_y;
-                    break;
-                case Surface.ROTATION_270:
-                    button_x = y / frame_y;
-                    button_y = (frame_x - x) / frame_x;
-                    break;
-                default:
-                    button_x = x / frame_x;
-                    button_y = y / frame_y;
-                    break;
-            }
         }
 
         @Override
@@ -204,54 +169,83 @@ public class FloatButton extends ImageView {
 
         @Override
         public void onOrientationChanged(int orientation) {
-            Point screen_size = new Point();
-            window_manager.getDefaultDisplay().getSize(screen_size);
             int rotation = window_manager.getDefaultDisplay().getRotation();
             if (screen_rotation != rotation) {
-                int frame_x = screen_size.x;
-                int frame_y = screen_size.y - status_bar_height;
-                int x, y;
-
-                switch (rotation) {
-                    case Surface.ROTATION_90:
-                        x = (int) (frame_x * button_y);
-                        y = (int) (frame_y - frame_y * button_x);
-                        break;
-                    case Surface.ROTATION_180:
-                        x = (int) (frame_x - frame_x * button_x);
-                        y = (int) (frame_y - frame_y * button_y);
-                        break;
-                    case Surface.ROTATION_270:
-                        x = (int) (frame_x - frame_x * button_y);
-                        y = (int) (frame_y * button_x);
-                        break;
-                    default:
-                        x = (int) (frame_x * button_x);
-                        y = (int) (frame_y * button_y);
-                        break;
-                }
-
-                // Stick to edge
-                if (x <= stick_distance_x) {
-                    x = button_width / 2;
-                } else if (x >= screen_size.x - stick_distance_x) {
-                    x = screen_size.x - button_width / 2;
-                }
-                if (y <= stick_distance_y) {
-                    y = button_height / 2;
-                } else if (y >= screen_size.y - status_bar_height - stick_distance_y) {
-                    y = screen_size.y - status_bar_height - button_height / 2;
-                }
-
-                relocateView(x, y);
+                Point real = new Point();
+                coordinateVirtualToReal(virtual_coordinate, real);
+                coordinateRealStickEdge(real);
+                move(real);
                 screen_rotation = rotation;
             }
         }
+    }
 
-        private void relocateView(int x, int y) {
-            layout_params.x = x - button_width / 2;
-            layout_params.y = y - button_height / 2;
-            window_manager.updateViewLayout(FloatButton.this, layout_params);
+    static final int VIRTUAL_SCREEN_DIMENSION = 100000;
+
+    private void coordinateRealToVirtual(Point real, Point virtual) {
+        int rotation = window_manager.getDefaultDisplay().getRotation();
+        Point frame_size = new Point();
+        window_manager.getDefaultDisplay().getSize(frame_size);
+        frame_size.y -= status_bar_height;
+
+        switch (rotation) {
+            case Surface.ROTATION_90:
+                virtual.x = VIRTUAL_SCREEN_DIMENSION * (frame_size.y - real.y) / frame_size.y;
+                virtual.y = VIRTUAL_SCREEN_DIMENSION * real.x / frame_size.x;
+                break;
+            case Surface.ROTATION_180:
+                virtual.x = VIRTUAL_SCREEN_DIMENSION * (frame_size.x - real.x) / frame_size.x;
+                virtual.y = VIRTUAL_SCREEN_DIMENSION * (frame_size.y - real.y) / frame_size.y;
+                break;
+            case Surface.ROTATION_270:
+                virtual.x = VIRTUAL_SCREEN_DIMENSION * real.y / frame_size.y;
+                virtual.y = VIRTUAL_SCREEN_DIMENSION * (frame_size.x - real.x) / frame_size.x;
+                break;
+            default:
+                virtual.x = VIRTUAL_SCREEN_DIMENSION * real.x / frame_size.x;
+                virtual.y = VIRTUAL_SCREEN_DIMENSION * real.y / frame_size.y;
+                break;
+        }
+    }
+
+    private void coordinateVirtualToReal(Point virtual, Point real) {
+        int rotation = window_manager.getDefaultDisplay().getRotation();
+        Point frame_size = new Point();
+        window_manager.getDefaultDisplay().getSize(frame_size);
+        frame_size.y -= status_bar_height;
+
+        switch (rotation) {
+            case Surface.ROTATION_90:
+                real.x = (frame_size.x * virtual.y / VIRTUAL_SCREEN_DIMENSION);
+                real.y = (frame_size.y - frame_size.y * virtual.x / VIRTUAL_SCREEN_DIMENSION);
+                break;
+            case Surface.ROTATION_180:
+                real.x = (frame_size.x - frame_size.x * virtual.x / VIRTUAL_SCREEN_DIMENSION);
+                real.y = (frame_size.y - frame_size.y * virtual.y / VIRTUAL_SCREEN_DIMENSION);
+                break;
+            case Surface.ROTATION_270:
+                real.x = (frame_size.x - frame_size.x * virtual.y / VIRTUAL_SCREEN_DIMENSION);
+                real.y = (frame_size.y * virtual.x / VIRTUAL_SCREEN_DIMENSION);
+                break;
+            default:
+                real.x = (frame_size.x * virtual.x / VIRTUAL_SCREEN_DIMENSION);
+                real.y = frame_size.y * virtual.y / VIRTUAL_SCREEN_DIMENSION;
+                break;
+        }
+    }
+
+    private void coordinateRealStickEdge(Point real) {
+        Point screen_size = new Point();
+        window_manager.getDefaultDisplay().getSize(screen_size);
+        if (real.x <= stick_distance_x) {
+            real.x = button_width / 2;
+        } else if (real.x >= screen_size.x - stick_distance_x) {
+            real.x = screen_size.x - button_width / 2;
+        }
+        if (real.y <= stick_distance_y) {
+            real.y = button_height / 2;
+        } else if (real.y >= screen_size.y - status_bar_height - stick_distance_y) {
+            real.y = screen_size.y - status_bar_height - button_height / 2;
         }
     }
 }
