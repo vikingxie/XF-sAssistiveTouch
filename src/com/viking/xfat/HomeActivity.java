@@ -1,14 +1,12 @@
 package com.viking.xfat;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.admin.DevicePolicyManager;
-import android.content.*;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
 public class HomeActivity extends Activity {
