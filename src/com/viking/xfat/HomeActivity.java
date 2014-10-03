@@ -1,13 +1,19 @@
 package com.viking.xfat;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.*;
 import android.widget.CompoundButton;
+import android.widget.SeekBar;
+
+import java.lang.reflect.Field;
 
 public class HomeActivity extends Activity {
     static final String KEY_FIRST_RUN = "first_run";
@@ -15,6 +21,7 @@ public class HomeActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setOverflowShowingAlways();
         setContentView(R.layout.home);
         initComponent();
         addAdminComp();
@@ -89,5 +96,75 @@ public class HomeActivity extends Activity {
             PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().putBoolean(KEY_FIRST_RUN, false).commit();
             Utility.ShowInstruction(HomeActivity.this);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.option_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_preference:
+                showPreferenceDialog();
+                break;
+            case R.id.menu_instruction:
+                Utility.ShowInstruction(HomeActivity.this);
+                break;
+
+        }
+        return super.onMenuItemSelected(featureId, item);
+    }
+
+    private void setOverflowShowingAlways() {
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+            menuKeyField.setAccessible(true);
+            menuKeyField.setBoolean(config, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showPreferenceDialog() {
+        final float transparent_value = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).getFloat("key_transparent", 0.25f);
+
+        View layout = getLayoutInflater().inflate(R.layout.preference, (ViewGroup) findViewById(R.id.layout_preference));
+        SeekBar transparent = ((SeekBar) layout.findViewById(R.id.preference_transparent));
+        transparent.setProgress((int) (transparent_value * transparent.getMax()));
+        transparent.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().putFloat("key_transparent", (float)progress / seekBar.getMax()).commit();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        new AlertDialog.Builder(HomeActivity.this).setTitle(R.string.preference).setIcon(R.drawable.preference).
+                setView(layout).
+                setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //todo: Save preference
+                    }
+                }).
+                setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Revert preference
+                        PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().putFloat("key_transparent", transparent_value).commit();
+                    }
+                }).create().show();
     }
 }

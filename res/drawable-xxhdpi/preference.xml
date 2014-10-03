@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <size android:height="144px" android:width="144px"/>
+            <solid android:color="#00000000"/>
+        </shape>
+    </item>
+
+    <item
+            android:top="28px"
+            android:bottom="106px"
+            android:left="24px"
+            android:right="24px">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF"/>
+        </shape>
+    </item>
+    <item
+            android:top="22px"
+            android:bottom="100px"
+            android:left="40px"
+            android:right="92px">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF"/>
+            <corners android:radius="5px"/>
+        </shape>
+    </item>
+
+    <item
+            android:top="106px"
+            android:bottom="28px"
+            android:left="24px"
+            android:right="24px">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF"/>
+            <corners android:radius="5px"/>
+        </shape>
+    </item>
+    <item
+            android:top="100px"
+            android:bottom="22px"
+            android:left="40px"
+            android:right="92px">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF"/>
+            <corners android:radius="5px"/>
+        </shape>
+    </item>
+
+    <item
+            android:top="67px"
+            android:bottom="67px"
+            android:left="24px"
+            android:right="24px">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF"/>
+            <corners android:radius="5px"/>
+        </shape>
+    </item>
+    <item
+            android:top="61px"
+            android:bottom="61px"
+            android:left="92px"
+            android:right="40px">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF"/>
+            <corners android:radius="5px"/>
+        </shape>
+    </item>
+
+</layer-list>

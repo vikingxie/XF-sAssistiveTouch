@@ -11,4 +11,7 @@
         \n
     </string>
     <string name="ok">OK</string>
+    <string name="preference">Preference</string>
+    <string name="transparent">Transparent</string>
+    <string name="cancel">Cnacel</string>
 </resources>
