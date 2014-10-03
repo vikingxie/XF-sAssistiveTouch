@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.Process;
 
 public class FloatService extends Service {
     static final int NOTIFY_ID = 0;
@@ -40,5 +41,6 @@ public class FloatService extends Service {
             fb.hide();
         }
         super.onDestroy();
+        Process.killProcess(Process.myPid());
     }
 }
