@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.IBinder;
 
 public class FloatService extends Service {
-    static final int NOTIFY_ID = 8783638;
+    static final int NOTIFY_ID = 0;
     private FloatButton fb = null;
 
     @Override
@@ -27,8 +27,8 @@ public class FloatService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (null == fb) {
             fb = new FloatButton(getApplicationContext());
-            fb.show();
         }
+        fb.show();
         ((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).cancel(NOTIFY_ID);
         return START_STICKY;
     }
