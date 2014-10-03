@@ -130,7 +130,8 @@ public class HomeActivity extends Activity {
     }
 
     private void showPreferenceDialog() {
-        final float transparent_value = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).getFloat("key_transparent", 0.25f);
+        final float transparent_value = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).
+                getFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), Float.parseFloat(DefaultPreference.BUTTON_TRANSPARENT.getDefaultValue()));
 
         View layout = getLayoutInflater().inflate(R.layout.preference, (ViewGroup) findViewById(R.id.layout_preference));
         SeekBar transparent = ((SeekBar) layout.findViewById(R.id.preference_transparent));
@@ -138,7 +139,8 @@ public class HomeActivity extends Activity {
         transparent.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().putFloat("key_transparent", (float)progress / seekBar.getMax()).commit();
+                PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().
+                        putFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), (float)progress / seekBar.getMax()).commit();
             }
 
             @Override
@@ -163,7 +165,8 @@ public class HomeActivity extends Activity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Revert preference
-                        PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().putFloat("key_transparent", transparent_value).commit();
+                        PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().
+                                putFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), transparent_value).commit();
                     }
                 }).create().show();
     }

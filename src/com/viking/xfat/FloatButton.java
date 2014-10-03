@@ -14,7 +14,7 @@ public class FloatButton extends ImageView {
     static final long animation_frame_delay = 50; // ms
 
     int status_bar_height = 0;
-    float button_alpha = 0.25f;
+    float button_alpha;
     int button_height, button_width;
     float stick_distance_x, stick_distance_y;
     Point virtual_coordinate = new Point();
@@ -29,7 +29,8 @@ public class FloatButton extends ImageView {
     public FloatButton(Context context) {
         super(context);
         status_bar_height = Utility.GetStatusBarHeight(context);
-        button_alpha = PreferenceManager.getDefaultSharedPreferences(context).getFloat("button_alpha", 0.25f);
+        button_alpha = PreferenceManager.getDefaultSharedPreferences(context).
+                getFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), Float.parseFloat(DefaultPreference.BUTTON_TRANSPARENT.getDefaultValue()));
         window_manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         createDrawable();
         createLayoutParams();
