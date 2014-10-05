@@ -35,6 +35,6 @@ public class FloatService extends Service {
             fb.hide();
         }
         super.onDestroy();
-        Process.killProcess(Process.myPid());
+        //Process.killProcess(Process.myPid());
     }
 }
