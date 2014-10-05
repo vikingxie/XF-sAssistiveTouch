@@ -18,6 +18,7 @@ public class FloatButton extends ImageView {
     float button_alpha;
     int button_height, button_width;
     float stick_distance_x, stick_distance_y;
+    private boolean need_animation = false;
     Point virtual_coordinate = new Point();
     Drawable button_image = null;
     WindowManager.LayoutParams layout_params = null;
@@ -178,7 +179,7 @@ public class FloatButton extends ImageView {
     }
 
     private class TouchListener implements OnTouchListener {
-        private GestureDetector gesture_detector=null;
+        private GestureDetector gesture_detector = null;
 
         public TouchListener(Context context) {
             gesture_detector = new GestureDetector(context, new GestureListener());
@@ -188,8 +189,11 @@ public class FloatButton extends ImageView {
         public boolean onTouch(View v, MotionEvent event) {
             switch (event.getAction()) {
                 case  MotionEvent.ACTION_UP:
-                    fadeout_animation.cancel();
-                    stick_animation.start();
+                    if (need_animation) {
+                        need_animation = true;
+                        fadeout_animation.cancel();
+                        stick_animation.start();
+                    }
                     break;
 
                 case MotionEvent.ACTION_DOWN:
@@ -221,6 +225,7 @@ public class FloatButton extends ImageView {
             coordinateRealStickEdge(real);
             move(real, 1.0f);
             coordinateRealToVirtual(real, virtual_coordinate);
+            need_animation = true;
             return true;
         }
 
@@ -235,6 +240,7 @@ public class FloatButton extends ImageView {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
             Utility.GoHome(getContext());
+            need_animation = true;
             return true;
         }
 
