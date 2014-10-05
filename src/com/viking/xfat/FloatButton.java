@@ -3,6 +3,7 @@ package com.viking.xfat;
 import android.animation.TimeAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
@@ -25,6 +26,7 @@ public class FloatButton extends ImageView {
     TimeAnimator stick_animation = null;
     int stick_animation_speed = 0;
     OrientationEventListener orientation_listener = null;
+    PreferenceListener preference_listener = null;
 
     public FloatButton(Context context) {
         super(context);
@@ -37,15 +39,18 @@ public class FloatButton extends ImageView {
         createAnimation();
         setOnTouchListener(new TouchListener(context));
         orientation_listener = new OrientationListener(context);
+        preference_listener = new PreferenceListener();
     }
 
     public void show() {
         window_manager.addView(this, layout_params);
         stick_animation.start(); //fadeout_animation.start();
         orientation_listener.enable();
+        PreferenceManager.getDefaultSharedPreferences(getContext()).registerOnSharedPreferenceChangeListener(preference_listener);
     }
 
     public void hide() {
+        PreferenceManager.getDefaultSharedPreferences(getContext()).unregisterOnSharedPreferenceChangeListener(preference_listener);
         orientation_listener.disable();
         stick_animation.cancel();
         fadeout_animation.cancel();
@@ -79,7 +84,7 @@ public class FloatButton extends ImageView {
         layout_params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         layout_params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         layout_params.format = PixelFormat.RGBA_8888;
-        layout_params.gravity = Gravity.TOP | Gravity.LEFT;
+        layout_params.gravity = Gravity.TOP | Gravity.START;
         layout_params.x = 0;
         layout_params.y = 0;
         layout_params.width = WindowManager.LayoutParams.WRAP_CONTENT;
@@ -257,6 +262,22 @@ public class FloatButton extends ImageView {
                 coordinateRealStickEdge(real);
                 move(real);
                 screen_rotation = rotation;
+            }
+        }
+    }
+
+    private class PreferenceListener implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if (key.equals(DefaultPreference.BUTTON_TRANSPARENT.getKey())) {
+                button_alpha = sharedPreferences.getFloat(key, Float.parseFloat(DefaultPreference.BUTTON_TRANSPARENT.getDefaultValue()));
+
+                fadeout_animation.cancel();
+                fadeout_animation.setFloatValues(1.0f, button_alpha);
+
+                layout_params.alpha = button_alpha;
+                window_manager.updateViewLayout(FloatButton.this, layout_params);
             }
         }
     }
