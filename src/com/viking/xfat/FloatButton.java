@@ -190,7 +190,7 @@ public class FloatButton extends ImageView {
             switch (event.getAction()) {
                 case  MotionEvent.ACTION_UP:
                     if (need_animation) {
-                        need_animation = true;
+                        need_animation = false;
                         fadeout_animation.cancel();
                         stick_animation.start();
                     }
@@ -247,6 +247,7 @@ public class FloatButton extends ImageView {
         @Override
         public void onLongPress(MotionEvent e) {
             Utility.OpenRecentActivity(getContext());
+            need_animation = true;
         }
     }
 
