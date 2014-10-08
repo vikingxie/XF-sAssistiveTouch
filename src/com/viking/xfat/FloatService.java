@@ -21,7 +21,6 @@ public class FloatService extends Service {
         if (null == fb) {
             fb = new FloatButton(getApplicationContext());
         }
-        fb.show();
 
         Notification notification = new Notification();
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
@@ -31,6 +30,12 @@ public class FloatService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+        try {
+            fb.hide();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        fb.show();
         return START_STICKY;
     }
 
@@ -41,6 +46,6 @@ public class FloatService extends Service {
             fb.hide();
         }
         super.onDestroy();
-        //Process.killProcess(Process.myPid());
+        Process.killProcess(Process.myPid());
     }
 }

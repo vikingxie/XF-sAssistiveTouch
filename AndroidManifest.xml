@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".FloatService"/>
+        <service android:name=".FloatService" android:process=":remote"/>
 
         <receiver
             android:name=".DeviceAdminReceiver"
