@@ -18,7 +18,7 @@ public class FloatButton extends ImageView {
     float button_alpha;
     int button_height, button_width;
     float stick_distance_x, stick_distance_y;
-    private boolean button_scolled = false;
+    private boolean button_scrolled = false;
     Point virtual_coordinate = new Point();
     Drawable button_image = null;
     WindowManager.LayoutParams layout_params = null;
@@ -192,8 +192,8 @@ public class FloatButton extends ImageView {
         public boolean onTouch(View v, MotionEvent event) {
             switch (event.getAction()) {
                 case  MotionEvent.ACTION_UP:
-                    if (button_scolled) {
-                        button_scolled = false;
+                    if (button_scrolled) {
+                        button_scrolled = false;
                         stick_animation.start();
                     }
                     break;
@@ -230,7 +230,7 @@ public class FloatButton extends ImageView {
             coordinateRealStickEdge(real);
             move(real, 1.0f);
             coordinateRealToVirtual(real, virtual_coordinate);
-            button_scolled = true;
+            button_scrolled = true;
             return true;
         }
 
