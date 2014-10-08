@@ -125,7 +125,6 @@ public class FloatButton extends ImageView {
                     fadeout_animation.start();
                 }
                 coordinateRealToVirtual(real, virtual_coordinate);
-                coordinateVirtualToReal(virtual_coordinate, real);
             }
 
             private boolean stickStep(Point real) {
@@ -234,6 +233,7 @@ public class FloatButton extends ImageView {
             Context context = getContext();
             Utility.GoHome(context);
             Utility.LockScreen(context);
+            need_animation = false;
             return true;
         }
 
