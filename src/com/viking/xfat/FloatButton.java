@@ -18,7 +18,7 @@ public class FloatButton extends ImageView {
     float button_alpha;
     int button_height, button_width;
     float stick_distance_x, stick_distance_y;
-    private boolean need_animation = false;
+    private boolean button_scolled = false;
     Point virtual_coordinate = new Point();
     Drawable button_image = null;
     WindowManager.LayoutParams layout_params = null;
@@ -71,6 +71,11 @@ public class FloatButton extends ImageView {
         window_manager.updateViewLayout(FloatButton.this, layout_params);
     }
 
+    public void transparent(float alpha) {
+        layout_params.alpha = alpha;
+        window_manager.updateViewLayout(FloatButton.this, layout_params);
+    }
+
     private void createDrawable() {
         button_image = getContext().getResources().getDrawable(R.drawable.icon);
         setImageDrawable(button_image);
@@ -101,12 +106,11 @@ public class FloatButton extends ImageView {
         fadeout_animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                layout_params.alpha = (Float) animation.getAnimatedValue();
-                window_manager.updateViewLayout(FloatButton.this, layout_params);
+                transparent((Float) animation.getAnimatedValue());
             }
         });
 
-        stick_animation_speed = Utility.DIP2PX(getContext(), 5);
+        stick_animation_speed = Utility.DIP2PX(getContext(), 10);
         stick_animation = new TimeAnimator();
         stick_animation.setTimeListener(new TimeAnimator.TimeListener() {
             Point real = new Point();
@@ -188,16 +192,11 @@ public class FloatButton extends ImageView {
         public boolean onTouch(View v, MotionEvent event) {
             switch (event.getAction()) {
                 case  MotionEvent.ACTION_UP:
-                    if (need_animation) {
-                        need_animation = false;
-                        fadeout_animation.cancel();
+                    if (button_scolled) {
+                        button_scolled = false;
                         stick_animation.start();
                     }
                     break;
-
-                case MotionEvent.ACTION_DOWN:
-                    stick_animation.cancel();
-                    fadeout_animation.cancel();
             }
             return gesture_detector.onTouchEvent(event);
         }
@@ -205,9 +204,16 @@ public class FloatButton extends ImageView {
 
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         private float dx, dy; // x,y relative to view
+        private boolean double_taped = false;
 
         @Override
         public boolean onDown(MotionEvent e) {
+            stick_animation.cancel();
+            fadeout_animation.cancel();
+            if (!double_taped) {
+                transparent(1.0f);
+            }
+            double_taped = false;
             dx = e.getX();
             dy = e.getY();
             return true;
@@ -224,30 +230,31 @@ public class FloatButton extends ImageView {
             coordinateRealStickEdge(real);
             move(real, 1.0f);
             coordinateRealToVirtual(real, virtual_coordinate);
-            need_animation = true;
+            button_scolled = true;
             return true;
         }
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
+            transparent(button_alpha);
+            double_taped = true;
             Context context = getContext();
             Utility.GoHome(context);
             Utility.LockScreen(context);
-            need_animation = false;
             return true;
         }
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
+            fadeout_animation.start();
             Utility.GoHome(getContext());
-            need_animation = true;
             return true;
         }
 
         @Override
         public void onLongPress(MotionEvent e) {
+            fadeout_animation.start();
             Utility.OpenRecentActivity(getContext());
-            need_animation = true;
         }
     }
 
