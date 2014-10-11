@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.*;
 import android.content.pm.ApplicationInfo;
+import android.provider.Settings;
 
 import java.lang.reflect.Field;
 
@@ -97,5 +98,21 @@ public class Utility {
         }
 
         //todo: Show customize recent app view
+    }
+
+    public static void OpenAllApp(Context context) {
+        Intent intent = new Intent(Intent.ACTION_ALL_APPS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+        try {
+            context.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void OpenSetting(Context context) {
+        Intent intent = new Intent(Settings.ACTION_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        context.startActivity(intent);
     }
 }
