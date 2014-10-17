@@ -113,6 +113,7 @@ public class Utility {
             Method statusbar_method = statusbar_class.getMethod("toggleRecentApps");
             statusbar_method.setAccessible(true);
             statusbar_method.invoke(statusbar_object);
+            return;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
@@ -126,6 +127,8 @@ public class Utility {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+
+        OpenRecentActivity(context);
     }
 
     public static void OpenAllApp(Context context) {
