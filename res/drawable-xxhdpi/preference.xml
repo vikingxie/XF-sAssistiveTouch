@@ -12,7 +12,7 @@
             android:top="28px"
             android:bottom="106px"
             android:left="24px"
-            android:right="24px">
+            android:right="106px">
         <shape android:shape="rectangle">
             <solid android:color="#FFFFFF"/>
         </shape>
@@ -27,15 +27,23 @@
             <corners android:radius="5px"/>
         </shape>
     </item>
+    <item
+        android:top="28px"
+        android:bottom="106px"
+        android:left="54px"
+        android:right="24px">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF"/>
+        </shape>
+    </item>
 
     <item
             android:top="106px"
             android:bottom="28px"
             android:left="24px"
-            android:right="24px">
+            android:right="106px">
         <shape android:shape="rectangle">
             <solid android:color="#FFFFFF"/>
-            <corners android:radius="5px"/>
         </shape>
     </item>
     <item
@@ -48,15 +56,23 @@
             <corners android:radius="5px"/>
         </shape>
     </item>
+    <item
+        android:top="106px"
+        android:bottom="28px"
+        android:left="54px"
+        android:right="24px">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF"/>
+        </shape>
+    </item>
 
     <item
             android:top="67px"
             android:bottom="67px"
             android:left="24px"
-            android:right="24px">
+            android:right="54px">
         <shape android:shape="rectangle">
             <solid android:color="#FFFFFF"/>
-            <corners android:radius="5px"/>
         </shape>
     </item>
     <item
@@ -67,6 +83,15 @@
         <shape android:shape="rectangle">
             <solid android:color="#FFFFFF"/>
             <corners android:radius="5px"/>
+        </shape>
+    </item>
+    <item
+        android:top="67px"
+        android:bottom="67px"
+        android:left="106px"
+        android:right="24px">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF"/>
         </shape>
     </item>
 
