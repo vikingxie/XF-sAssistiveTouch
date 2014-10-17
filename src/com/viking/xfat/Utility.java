@@ -6,9 +6,13 @@ import android.app.Dialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.*;
 import android.content.pm.ApplicationInfo;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.provider.Settings;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class Utility {
 
@@ -98,6 +102,30 @@ public class Utility {
         }
 
         //todo: Show customize recent app view
+    }
+
+    public static void ToggleRecentApps(Context context) {
+        try {
+            Class sm = Class.forName("android.os.ServiceManager");
+            IBinder statusbar_binder = (IBinder)sm.getMethod("getService", String.class).invoke(sm, "statusbar");
+            Class statusbar_class = Class.forName(statusbar_binder.getInterfaceDescriptor());
+            Object statusbar_object = statusbar_class.getClasses()[0].getMethod("asInterface", IBinder.class).invoke(null, new Object[] { statusbar_binder });
+            Method statusbar_method = statusbar_class.getMethod("toggleRecentApps");
+            statusbar_method.setAccessible(true);
+            statusbar_method.invoke(statusbar_object);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void OpenAllApp(Context context) {
