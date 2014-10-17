@@ -24,6 +24,7 @@
         android:right="26px">
         <shape android:shape="oval">
             <solid android:color="#CCCCCC"/>
+            <stroke android:color="#666666" android:width="1px"/>
         </shape>
     </item>
     <item
@@ -33,6 +34,7 @@
         android:right="40px">
         <shape android:shape="oval">
             <solid android:color="#FFFFFF"/>
+            <stroke android:color="#888888" android:width="1px"/>
         </shape>
     </item>
 </layer-list>
