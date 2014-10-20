@@ -58,21 +58,33 @@ public class FloatButton extends ImageView {
         window_manager.removeView(this);
     }
 
-    public void move(Point coordinate) {
+    public void updateLayoutParams(Point coordinate) {
         layout_params.x = coordinate.x - button_width / 2;
         layout_params.y = coordinate.y - button_height / 2;
-        window_manager.updateViewLayout(FloatButton.this, layout_params);
     }
 
-    public void move(Point coordinate, float alpha) {
+    public void updateLayoutParams(float alpha) {
+        layout_params.alpha = alpha;
+    }
+
+    public void updateLayoutParams(Point coordinate, float alpha) {
         layout_params.x = coordinate.x - button_width / 2;
         layout_params.y = coordinate.y - button_height / 2;
         layout_params.alpha = alpha;
+    }
+
+    public void updateView(Point coordinate) {
+        updateLayoutParams(coordinate);
         window_manager.updateViewLayout(FloatButton.this, layout_params);
     }
 
-    public void transparent(float alpha) {
-        layout_params.alpha = alpha;
+    public void updateView(Point coordinate, float alpha) {
+        updateLayoutParams(coordinate, alpha);
+        window_manager.updateViewLayout(FloatButton.this, layout_params);
+    }
+
+    public void updateView(float alpha) {
+        updateLayoutParams(alpha);
         window_manager.updateViewLayout(FloatButton.this, layout_params);
     }
 
@@ -96,6 +108,14 @@ public class FloatButton extends ImageView {
         layout_params.width = WindowManager.LayoutParams.WRAP_CONTENT;
         layout_params.height =WindowManager.LayoutParams.WRAP_CONTENT;
         layout_params.alpha = 1.0f;
+
+        Point real = new Point();
+        virtual_coordinate.x = PreferenceManager.getDefaultSharedPreferences(getContext()).
+                getInt(DefaultPreference.LAST_VIRTUAL_X.getKey(), Integer.parseInt(DefaultPreference.LAST_VIRTUAL_X.getDefaultValue()));
+        virtual_coordinate.y = PreferenceManager.getDefaultSharedPreferences(getContext()).
+                getInt(DefaultPreference.LAST_VIRTUAL_Y.getKey(), Integer.parseInt(DefaultPreference.LAST_VIRTUAL_Y.getDefaultValue()));
+        coordinateVirtualToReal(virtual_coordinate, real);
+        updateLayoutParams(real);
     }
 
     private void createAnimation() {
@@ -106,7 +126,7 @@ public class FloatButton extends ImageView {
         fadeout_animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                transparent((Float) animation.getAnimatedValue());
+                updateView((Float) animation.getAnimatedValue());
             }
         });
 
@@ -117,9 +137,10 @@ public class FloatButton extends ImageView {
 
             @Override
             public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
+                boolean is_animation_end = false;
                 coordinateVirtualToReal(virtual_coordinate, real);
                 if (stickStep(real)) {
-                    move(real, 1.0f);
+                    updateView(real, 1.0f);
                 } else {
                     coordinateRealStickEdge(real);
                     stick_animation.cancel();
@@ -127,8 +148,15 @@ public class FloatButton extends ImageView {
                         fadeout_animation.cancel();
                     }
                     fadeout_animation.start();
+                    is_animation_end = true;
                 }
                 coordinateRealToVirtual(real, virtual_coordinate);
+                if (is_animation_end) {
+                    PreferenceManager.getDefaultSharedPreferences(getContext()).edit().
+                            putInt(DefaultPreference.LAST_VIRTUAL_X.getKey(), virtual_coordinate.x).
+                            putInt(DefaultPreference.LAST_VIRTUAL_Y.getKey(), virtual_coordinate.y).
+                            commit();
+                }
             }
 
             private boolean stickStep(Point real) {
@@ -211,7 +239,7 @@ public class FloatButton extends ImageView {
             stick_animation.cancel();
             fadeout_animation.cancel();
             if (!double_taped) {
-                transparent(1.0f);
+                updateView(1.0f);
             }
             double_taped = false;
             dx = e.getX();
@@ -228,7 +256,7 @@ public class FloatButton extends ImageView {
 
             Point real = new Point((int)x, (int)y);
             coordinateRealStickEdge(real);
-            move(real, 1.0f);
+            updateView(real, 1.0f);
             coordinateRealToVirtual(real, virtual_coordinate);
             button_scrolled = true;
             return true;
@@ -236,7 +264,7 @@ public class FloatButton extends ImageView {
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            transparent(button_alpha);
+            updateView(button_alpha);
             double_taped = true;
             Context context = getContext();
             Utility.GoHome(context);
@@ -274,7 +302,7 @@ public class FloatButton extends ImageView {
                 Point real = new Point();
                 coordinateVirtualToReal(virtual_coordinate, real);
                 coordinateRealStickEdge(real);
-                move(real);
+                updateView(real);
                 screen_rotation = rotation;
             }
         }
