@@ -282,7 +282,7 @@ public class FloatButton extends ImageView {
         @Override
         public void onLongPress(MotionEvent e) {
             fadeout_animation.start();
-            Utility.OpenRecentActivity(getContext());
+            Utility.ToggleRecentApps(getContext());
         }
     }
 

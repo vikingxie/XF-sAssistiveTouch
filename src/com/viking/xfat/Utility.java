@@ -105,14 +105,18 @@ public class Utility {
     }
 
     public static void ToggleRecentApps(Context context) {
+        Class serviceManagerClass;
         try {
-            Class sm = Class.forName("android.os.ServiceManager");
-            IBinder statusbar_binder = (IBinder)sm.getMethod("getService", String.class).invoke(sm, "statusbar");
-            Class statusbar_class = Class.forName(statusbar_binder.getInterfaceDescriptor());
-            Object statusbar_object = statusbar_class.getClasses()[0].getMethod("asInterface", IBinder.class).invoke(null, new Object[] { statusbar_binder });
-            Method statusbar_method = statusbar_class.getMethod("toggleRecentApps");
-            statusbar_method.setAccessible(true);
-            statusbar_method.invoke(statusbar_object);
+            serviceManagerClass = Class.forName("android.os.ServiceManager");
+            Method getService = serviceManagerClass.getMethod("getService", String.class);
+            IBinder retbinder = (IBinder) getService.invoke(serviceManagerClass, "statusbar");
+            Class statusBarClass = Class.forName(retbinder.getInterfaceDescriptor());
+            Object statusBarObject = statusBarClass.getClasses()[0].getMethod(
+                    "asInterface", IBinder.class).invoke(null,
+                    new Object[] { retbinder });
+            Method clearAll = statusBarClass.getMethod("toggleRecentApps");
+            clearAll.setAccessible(true);
+            clearAll.invoke(statusBarObject);
             return;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
