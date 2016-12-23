@@ -84,7 +84,7 @@ public class Utility {
     }
 
     private static final String[][] pcs = {
-            {"com.android.systemui", "com.android.systemui.recent.RecentsActivity"},
+            {"com.android.systemui", "com.android.systemui.recents.RecentsActivity"},
             {"com.htc.taskmanager", "com.htc.taskmanager.MainActivity"},
     };
 
@@ -98,7 +98,10 @@ public class Utility {
                 return;
             } catch (ActivityNotFoundException e) {
                 e.printStackTrace();
+            } catch (SecurityException e) {
+                e.printStackTrace();
             }
+
         }
 
         //todo: Show customize recent app view
