@@ -14,4 +14,5 @@
     <string name="preference">Preference</string>
     <string name="transparent">Transparent</string>
     <string name="cancel">Cnacel</string>
+    <string name="home_before_lock">Go home before lock screen</string>
 </resources>

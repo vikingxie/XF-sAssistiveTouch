@@ -12,11 +12,12 @@ import android.preference.PreferenceManager;
 import android.view.*;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
+import android.widget.Switch;
 
 import java.lang.reflect.Field;
 
 public class HomeActivity extends Activity {
-    static final String KEY_FIRST_RUN = "first_run";
+    private static final String KEY_FIRST_RUN = "first_run";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,7 @@ public class HomeActivity extends Activity {
         }
     }
 
-    static final int RESULT_FOR_ADD_DEVICE_ADMIN = 1;
+    private static final int RESULT_FOR_ADD_DEVICE_ADMIN = 1;
 
     private void addAdminComp() {
         DevicePolicyManager device_policy_manager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
@@ -132,8 +133,11 @@ public class HomeActivity extends Activity {
     private void showPreferenceDialog() {
         final float transparent_value = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).
                 getFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), Float.parseFloat(DefaultPreference.BUTTON_TRANSPARENT.getDefaultValue()));
+        final boolean home_before_lock_value = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).
+                getBoolean(DefaultPreference.HOME_BEFORE_LOCK.getKey(), Boolean.parseBoolean(DefaultPreference.HOME_BEFORE_LOCK.getDefaultValue()));
 
         View layout = getLayoutInflater().inflate(R.layout.preference, (ViewGroup) findViewById(R.id.layout_preference));
+
         SeekBar transparent = ((SeekBar) layout.findViewById(R.id.preference_transparent));
         transparent.setProgress((int) (transparent_value * transparent.getMax()));
         transparent.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -153,6 +157,17 @@ public class HomeActivity extends Activity {
 
             }
         });
+
+        Switch home_before_lock = (Switch) layout.findViewById(R.id.preference_home_before_lock);
+        home_before_lock.setChecked(home_before_lock_value);
+        home_before_lock.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().
+                        putBoolean(DefaultPreference.HOME_BEFORE_LOCK.getKey(), isChecked).commit();
+            }
+        });
+
         new AlertDialog.Builder(HomeActivity.this).setTitle(R.string.preference).setIcon(R.drawable.preference).
                 setView(layout).
                 setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {

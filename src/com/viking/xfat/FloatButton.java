@@ -267,7 +267,10 @@ public class FloatButton extends ImageView {
             updateView(button_alpha);
             double_taped = true;
             Context context = getContext();
-            Utility.GoHome(context);
+            if (PreferenceManager.getDefaultSharedPreferences(getContext()).
+                    getBoolean(DefaultPreference.HOME_BEFORE_LOCK.getKey(), Boolean.parseBoolean(DefaultPreference.HOME_BEFORE_LOCK.getDefaultValue()))) {
+                Utility.GoHome(context);
+            }
             Utility.LockScreen(context);
             return true;
         }
