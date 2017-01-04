@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.view.*;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
@@ -43,6 +44,9 @@ public class HomeActivity extends Activity {
         startButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!Utility.isAccessibilitySettingsOn(HomeActivity.this, AccService.class)) {
+                    startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+                }
                 toggleFloatService(isChecked);
             }
         });

@@ -6,15 +6,20 @@ import android.app.Dialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.*;
 import android.content.pm.ApplicationInfo;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.Settings;
+import android.text.TextUtils;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class Utility {
+    static final String TAG = "UTILITY";
 
     public static boolean IsFloatServiceRunning(Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
@@ -108,6 +113,17 @@ public class Utility {
     }
 
     public static void ToggleRecentApps(Context context) {
+        if (Build.VERSION.SDK_INT >= 19) {
+            if (isAccessibilitySettingsOn(context, AccService.class)) {
+                Intent service = new Intent(context, AccService.class);
+                service.putExtra("EXTRA_ACTION", AccService.ACTION_RECENTS);
+                context.startService(service);
+                return;
+            } else {
+                context.startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+            }
+        }
+
         Class serviceManagerClass;
         try {
             serviceManagerClass = Class.forName("android.os.ServiceManager");
@@ -152,5 +168,43 @@ public class Utility {
         Intent intent = new Intent(Settings.ACTION_SETTINGS);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
         context.startActivity(intent);
+    }
+
+    public static boolean isAccessibilitySettingsOn(Context mContext, Class accessibilitySeriveClass) {
+        int accessibilityEnabled = 0;
+        final String service = mContext.getPackageName() + "/" + accessibilitySeriveClass.getCanonicalName();
+        try {
+            accessibilityEnabled = Settings.Secure.getInt(
+                    mContext.getApplicationContext().getContentResolver(),
+                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+            Log.v(TAG, "accessibilityEnabled = " + accessibilityEnabled);
+        } catch (Settings.SettingNotFoundException e) {
+            Log.e(TAG, "Error finding setting, default accessibility to not found: "
+                    + e.getMessage());
+        }
+        TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
+
+        if (accessibilityEnabled == 1) {
+            Log.v(TAG, "***ACCESSIBILITY IS ENABLED*** -----------------");
+            String settingValue = Settings.Secure.getString(
+                    mContext.getApplicationContext().getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            if (settingValue != null) {
+                mStringColonSplitter.setString(settingValue);
+                while (mStringColonSplitter.hasNext()) {
+                    String accessibilityService = mStringColonSplitter.next();
+
+                    Log.v(TAG, "-------------- > accessibilityService :: " + accessibilityService + " " + service);
+                    if (accessibilityService.equalsIgnoreCase(service)) {
+                        Log.v(TAG, "We've found the correct setting - accessibility is switched on!");
+                        return true;
+                    }
+                }
+            }
+        } else {
+            Log.v(TAG, "***ACCESSIBILITY IS DISABLED***");
+        }
+
+        return false;
     }
 }
