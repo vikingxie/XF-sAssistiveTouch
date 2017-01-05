@@ -7,32 +7,34 @@ import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.preference.PreferenceManager;
 import android.view.*;
 import android.widget.ImageView;
 
-public class FloatButton extends ImageView {
-    static final long animation_frame_delay = 50; // ms
+import static android.content.Context.MODE_MULTI_PROCESS;
 
-    int status_bar_height = 0;
-    float button_alpha;
-    int button_height, button_width;
-    float stick_distance_x, stick_distance_y;
+public class FloatButton extends ImageView {
+    private static final long animation_frame_delay = 50; // ms
+
+    private int status_bar_height = 0;
+    private float button_alpha;
+    private int button_height, button_width;
+    private float stick_distance_x, stick_distance_y;
     private boolean button_scrolled = false;
-    Point virtual_coordinate = new Point();
-    Drawable button_image = null;
-    WindowManager.LayoutParams layout_params = null;
-    WindowManager window_manager = null;
-    ValueAnimator fadeout_animation = null;
-    TimeAnimator stick_animation = null;
-    int stick_animation_speed = 0;
-    OrientationEventListener orientation_listener = null;
-    PreferenceListener preference_listener = null;
+    private Point virtual_coordinate = new Point();
+    private WindowManager.LayoutParams layout_params = null;
+    private WindowManager window_manager = null;
+    private ValueAnimator fadeout_animation = null;
+    private TimeAnimator stick_animation = null;
+    private int stick_animation_speed = 0;
+    private OrientationEventListener orientation_listener = null;
+    private PreferenceListener preference_listener = null;
+    private Context context;
 
     public FloatButton(Context context) {
         super(context);
+        this.context = context;
         status_bar_height = Utility.GetStatusBarHeight(context);
-        button_alpha = PreferenceManager.getDefaultSharedPreferences(context).
+        button_alpha = context.getSharedPreferences(context.getString(R.string.pref_name), MODE_MULTI_PROCESS).
                 getFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), Float.parseFloat(DefaultPreference.BUTTON_TRANSPARENT.getDefaultValue()));
         window_manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         createDrawable();
@@ -47,11 +49,11 @@ public class FloatButton extends ImageView {
         window_manager.addView(this, layout_params);
         stick_animation.start(); //fadeout_animation.start();
         orientation_listener.enable();
-        PreferenceManager.getDefaultSharedPreferences(getContext()).registerOnSharedPreferenceChangeListener(preference_listener);
+        context.getSharedPreferences(context.getString(R.string.pref_name), MODE_MULTI_PROCESS).registerOnSharedPreferenceChangeListener(preference_listener);
     }
 
     public void hide() {
-        PreferenceManager.getDefaultSharedPreferences(getContext()).unregisterOnSharedPreferenceChangeListener(preference_listener);
+        context.getSharedPreferences(context.getString(R.string.pref_name), MODE_MULTI_PROCESS).unregisterOnSharedPreferenceChangeListener(preference_listener);
         orientation_listener.disable();
         stick_animation.cancel();
         fadeout_animation.cancel();
@@ -89,7 +91,7 @@ public class FloatButton extends ImageView {
     }
 
     private void createDrawable() {
-        button_image = getContext().getResources().getDrawable(R.drawable.icon);
+        Drawable button_image = context.getResources().getDrawable(R.drawable.icon);
         setImageDrawable(button_image);
         button_height = button_image.getMinimumHeight();
         button_width = button_image.getMinimumWidth();
@@ -110,10 +112,9 @@ public class FloatButton extends ImageView {
         layout_params.alpha = 1.0f;
 
         Point real = new Point();
-        virtual_coordinate.x = PreferenceManager.getDefaultSharedPreferences(getContext()).
-                getInt(DefaultPreference.LAST_VIRTUAL_X.getKey(), Integer.parseInt(DefaultPreference.LAST_VIRTUAL_X.getDefaultValue()));
-        virtual_coordinate.y = PreferenceManager.getDefaultSharedPreferences(getContext()).
-                getInt(DefaultPreference.LAST_VIRTUAL_Y.getKey(), Integer.parseInt(DefaultPreference.LAST_VIRTUAL_Y.getDefaultValue()));
+        SharedPreferences pref = context.getSharedPreferences(context.getString(R.string.pref_name), MODE_MULTI_PROCESS);
+        virtual_coordinate.x = pref.getInt(DefaultPreference.LAST_VIRTUAL_X.getKey(), Integer.parseInt(DefaultPreference.LAST_VIRTUAL_X.getDefaultValue()));
+        virtual_coordinate.y = pref.getInt(DefaultPreference.LAST_VIRTUAL_Y.getKey(), Integer.parseInt(DefaultPreference.LAST_VIRTUAL_Y.getDefaultValue()));
         coordinateVirtualToReal(virtual_coordinate, real);
         updateLayoutParams(real);
     }
@@ -130,7 +131,7 @@ public class FloatButton extends ImageView {
             }
         });
 
-        stick_animation_speed = Utility.DIP2PX(getContext(), 10);
+        stick_animation_speed = Utility.DIP2PX(context, 10);
         stick_animation = new TimeAnimator();
         stick_animation.setTimeListener(new TimeAnimator.TimeListener() {
             Point real = new Point();
@@ -152,7 +153,8 @@ public class FloatButton extends ImageView {
                 }
                 coordinateRealToVirtual(real, virtual_coordinate);
                 if (is_animation_end) {
-                    PreferenceManager.getDefaultSharedPreferences(getContext()).edit().
+                    context.getSharedPreferences(context.getString(R.string.pref_name), MODE_MULTI_PROCESS).
+                            edit().
                             putInt(DefaultPreference.LAST_VIRTUAL_X.getKey(), virtual_coordinate.x).
                             putInt(DefaultPreference.LAST_VIRTUAL_Y.getKey(), virtual_coordinate.y).
                             commit();
@@ -266,8 +268,7 @@ public class FloatButton extends ImageView {
         public boolean onDoubleTap(MotionEvent e) {
             updateView(button_alpha);
             double_taped = true;
-            Context context = getContext();
-            if (PreferenceManager.getDefaultSharedPreferences(getContext()).
+            if (context.getSharedPreferences(context.getString(R.string.pref_name), MODE_MULTI_PROCESS).
                     getBoolean(DefaultPreference.HOME_BEFORE_LOCK.getKey(), Boolean.parseBoolean(DefaultPreference.HOME_BEFORE_LOCK.getDefaultValue()))) {
                 Utility.GoHome(context);
             }
@@ -278,14 +279,14 @@ public class FloatButton extends ImageView {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
             fadeout_animation.start();
-            Utility.GoHome(getContext());
+            Utility.GoHome(FloatButton.this.context);
             return true;
         }
 
         @Override
         public void onLongPress(MotionEvent e) {
             fadeout_animation.start();
-            Utility.ToggleRecentApps(getContext());
+            Utility.ToggleRecentApps(FloatButton.this.context);
         }
     }
 
@@ -327,7 +328,7 @@ public class FloatButton extends ImageView {
         }
     }
 
-    static final double VIRTUAL_SCREEN_DIMENSION = 1000000;
+    private static final double VIRTUAL_SCREEN_DIMENSION = 1000000;
 
     private void coordinateRealToVirtual(Point real, Point virtual) {
         int rotation = window_manager.getDefaultDisplay().getRotation();

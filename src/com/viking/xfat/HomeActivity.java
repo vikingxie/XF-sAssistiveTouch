@@ -3,12 +3,8 @@ package com.viking.xfat;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.*;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.*;
 import android.widget.CompoundButton;
@@ -97,8 +93,9 @@ public class HomeActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).getBoolean(KEY_FIRST_RUN, true)) {
-            PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().putBoolean(KEY_FIRST_RUN, false).commit();
+        SharedPreferences pref = this.getSharedPreferences(getString(R.string.pref_name), MODE_MULTI_PROCESS);
+        if (pref.getBoolean(KEY_FIRST_RUN, true)) {
+            pref.edit().putBoolean(KEY_FIRST_RUN, false).commit();
             Utility.ShowInstruction(HomeActivity.this);
         }
     }
@@ -135,10 +132,10 @@ public class HomeActivity extends Activity {
     }
 
     private void showPreferenceDialog() {
-        final float transparent_value = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).
-                getFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), Float.parseFloat(DefaultPreference.BUTTON_TRANSPARENT.getDefaultValue()));
-        final boolean home_before_lock_value = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).
-                getBoolean(DefaultPreference.HOME_BEFORE_LOCK.getKey(), Boolean.parseBoolean(DefaultPreference.HOME_BEFORE_LOCK.getDefaultValue()));
+        //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this);
+        final SharedPreferences pref = getSharedPreferences(getString(R.string.pref_name), MODE_MULTI_PROCESS);
+        final float transparent_value = pref.getFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), Float.parseFloat(DefaultPreference.BUTTON_TRANSPARENT.getDefaultValue()));
+        final boolean home_before_lock_value = pref.getBoolean(DefaultPreference.HOME_BEFORE_LOCK.getKey(), Boolean.parseBoolean(DefaultPreference.HOME_BEFORE_LOCK.getDefaultValue()));
 
         View layout = getLayoutInflater().inflate(R.layout.preference, (ViewGroup) findViewById(R.id.layout_preference));
 
@@ -147,8 +144,7 @@ public class HomeActivity extends Activity {
         transparent.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().
-                        putFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), (float)progress / seekBar.getMax()).commit();
+                pref.edit().putFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), (float)progress / seekBar.getMax()).commit();
             }
 
             @Override
@@ -167,8 +163,7 @@ public class HomeActivity extends Activity {
         home_before_lock.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().
-                        putBoolean(DefaultPreference.HOME_BEFORE_LOCK.getKey(), isChecked).commit();
+                pref.edit().putBoolean(DefaultPreference.HOME_BEFORE_LOCK.getKey(), isChecked).commit();
             }
         });
 
@@ -184,8 +179,7 @@ public class HomeActivity extends Activity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Revert preference
-                        PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit().
-                                putFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), transparent_value).commit();
+                        pref.edit().putFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), transparent_value).commit();
                     }
                 }).create().show();
     }

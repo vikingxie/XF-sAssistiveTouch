@@ -7,7 +7,7 @@ import android.os.IBinder;
 import android.os.Process;
 
 public class FloatService extends Service {
-    static final int NOTIFY_ID = 0;
+    private static final int NOTIFY_ID = 0;
     private FloatButton fb = null;
 
     @Override
