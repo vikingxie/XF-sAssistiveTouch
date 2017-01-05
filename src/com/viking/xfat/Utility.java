@@ -12,7 +12,6 @@ import android.os.RemoteException;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -101,9 +100,7 @@ public class Utility {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                 context.startActivity(intent);
                 return;
-            } catch (ActivityNotFoundException e) {
-                e.printStackTrace();
-            } catch (SecurityException e) {
+            } catch (ActivityNotFoundException | SecurityException e) {
                 e.printStackTrace();
             }
 
@@ -137,17 +134,7 @@ public class Utility {
             clearAll.setAccessible(true);
             clearAll.invoke(statusBarObject);
             return;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException | IllegalAccessException | RemoteException e) {
             e.printStackTrace();
         }
 
