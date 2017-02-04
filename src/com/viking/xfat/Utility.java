@@ -110,17 +110,6 @@ public class Utility {
     }
 
     public static void ToggleRecentApps(Context context) {
-        if (Build.VERSION.SDK_INT >= 19) {
-            if (isAccessibilitySettingsOn(context, AccService.class)) {
-                Intent service = new Intent(context, AccService.class);
-                service.putExtra("EXTRA_ACTION", AccService.ACTION_RECENTS);
-                context.startService(service);
-                return;
-            } else {
-                context.startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
-            }
-        }
-
         Class serviceManagerClass;
         try {
             serviceManagerClass = Class.forName("android.os.ServiceManager");
@@ -136,6 +125,17 @@ public class Utility {
             return;
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException | IllegalAccessException | RemoteException e) {
             e.printStackTrace();
+        }
+
+        if (Build.VERSION.SDK_INT >= 19) {
+            if (isAccessibilitySettingsOn(context, AccService.class)) {
+                Intent service = new Intent(context, AccService.class);
+                service.putExtra("EXTRA_ACTION", AccService.ACTION_RECENTS);
+                context.startService(service);
+                return;
+            } else {
+                context.startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+            }
         }
 
         OpenRecentActivity(context);
