@@ -45,7 +45,7 @@ public class SideBar extends CFloatView {
         layout_params.format = PixelFormat.RGBA_8888;
         layout_params.gravity = Gravity.TOP | Gravity.START;
         layout_params.x = 0;
-        layout_params.y = frame_size.y / 2 - sidebar_height / 2;
+        layout_params.y = frame_size.y; // / 2 - sidebar_height / 2;
         layout_params.width = WindowManager.LayoutParams.WRAP_CONTENT;
         layout_params.height = WindowManager.LayoutParams.WRAP_CONTENT;
         layout_params.alpha = sidebar_alpha;
@@ -119,16 +119,18 @@ public class SideBar extends CFloatView {
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         private float ox, oy;
         private float step_r = 1.2f;
-        private double[] step_x = {step_r * Math.cos(0), step_r * Math.cos(Math.PI / 4), step_r * Math.cos(Math.PI / 4)};
-        private double[] step_y = {step_r * Math.sin(0), -step_r * Math.sin(Math.PI / 4), step_r * Math.sin(Math.PI / 4)};
+        private static final double ANGLE_CENTER = Math.PI / 4;
+        private static final double ANGLE_STEP = Math.PI / 6;
+        private double[] step_x = {step_r * Math.cos(ANGLE_CENTER), step_r * Math.cos(ANGLE_CENTER + ANGLE_STEP), step_r * Math.cos(ANGLE_CENTER - ANGLE_STEP)};
+        private double[] step_y = {-step_r * Math.sin(ANGLE_CENTER), -step_r * Math.sin(ANGLE_CENTER + ANGLE_STEP), -step_r * Math.sin(ANGLE_CENTER - ANGLE_STEP)};
         private float step_start = Utility.dip2px(getContext(), 24);
-        private float step_stop = Utility.dip2px(getContext(), 160) / step_r;
+        private float step_stop = Utility.dip2px(getContext(), 120) / step_r;
 
         @Override
         public boolean onDown(MotionEvent e) {
             ox = e.getRawX();
             oy = e.getRawY();
-            return true;
+            return false;
         }
 
         @Override
