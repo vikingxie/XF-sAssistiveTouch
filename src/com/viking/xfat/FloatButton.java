@@ -12,7 +12,7 @@ import android.widget.ImageView;
 
 import static android.content.Context.MODE_MULTI_PROCESS;
 
-public class FloatButton extends ImageView {
+public class FloatButton extends ImageView implements IFloatView {
     private static final long animation_frame_delay = 50; // ms
 
     private int status_bar_height = 0;
