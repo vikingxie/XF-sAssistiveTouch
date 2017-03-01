@@ -136,6 +136,7 @@ public class HomeActivity extends Activity {
         final SharedPreferences pref = getSharedPreferences(getString(R.string.pref_name), MODE_MULTI_PROCESS);
         final float transparent_value = pref.getFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), Float.parseFloat(DefaultPreference.BUTTON_TRANSPARENT.getDefaultValue()));
         final boolean home_before_lock_value = pref.getBoolean(DefaultPreference.HOME_BEFORE_LOCK.getKey(), Boolean.parseBoolean(DefaultPreference.HOME_BEFORE_LOCK.getDefaultValue()));
+        final boolean sidebar_enabled_value = pref.getBoolean(DefaultPreference.SIDEBAR_ENABLED.getKey(), Boolean.parseBoolean(DefaultPreference.SIDEBAR_ENABLED.getDefaultValue()));
 
         View layout = getLayoutInflater().inflate(R.layout.preference, (ViewGroup) findViewById(R.id.layout_preference));
 
@@ -164,6 +165,15 @@ public class HomeActivity extends Activity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 pref.edit().putBoolean(DefaultPreference.HOME_BEFORE_LOCK.getKey(), isChecked).commit();
+            }
+        });
+
+        Switch sidebar_enabled = (Switch) layout.findViewById(R.id.preference_sidebar);
+        sidebar_enabled.setChecked(sidebar_enabled_value);
+        sidebar_enabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                pref.edit().putBoolean(DefaultPreference.SIDEBAR_ENABLED.getKey(), isChecked).commit();
             }
         });
 

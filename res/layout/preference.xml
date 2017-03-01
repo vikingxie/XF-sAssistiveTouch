@@ -21,4 +21,10 @@
     <Switch
             android:layout_width="match_parent"
             android:layout_height="wrap_content" android:id="@+id/preference_home_before_lock"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/textView2" android:text="@string/sidebar"/>
+    <Switch
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/preference_sidebar"/>
 </LinearLayout>

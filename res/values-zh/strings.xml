@@ -15,4 +15,5 @@
     <string name="cancel">取消</string>
     <string name="home_before_lock">锁屏前先返回主屏</string>
     <string name="acc_service">使能长按打开任务管理器</string>
+    <string name="sidebar">侧边栏</string>
 </resources>

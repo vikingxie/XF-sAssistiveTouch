@@ -8,7 +8,7 @@ import android.os.Process;
 
 public class FloatService extends Service {
     private static final int NOTIFY_ID = 0;
-    private FloatButton fb = null;
+    private IFloatView fv = null;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -18,8 +18,14 @@ public class FloatService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (null == fb) {
-            fb = new FloatButton(getApplicationContext());
+        if (null == fv) {
+            if (getSharedPreferences(getString(R.string.pref_name), MODE_MULTI_PROCESS).
+                    getBoolean(DefaultPreference.SIDEBAR_ENABLED.getKey(), Boolean.parseBoolean(DefaultPreference.SIDEBAR_ENABLED.getDefaultValue()))) {
+                fv = new SideBar(getApplicationContext());
+            }
+            else {
+                fv = new FloatButton(getApplicationContext());
+            }
         }
 
         Notification notification = new Notification();
@@ -31,19 +37,19 @@ public class FloatService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         try {
-            fb.hide();
+            fv.hide();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        fb.show();
+        fv.show();
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         stopForeground(true);
-        if (null != fb) {
-            fb.hide();
+        if (null != fv) {
+            fv.hide();
         }
         super.onDestroy();
         Process.killProcess(Process.myPid());
