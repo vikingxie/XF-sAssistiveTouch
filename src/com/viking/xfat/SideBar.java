@@ -52,13 +52,14 @@ public class SideBar extends CFloatView {
     }
 
     private void createSideButton() {
-        int[] drawable_id = {R.drawable.home, R.drawable.recents, R.drawable.lock};
+        int[] drawable_id = {R.drawable.side_button_home, R.drawable.side_button_recents, R.drawable.side_button_lock};
         int size = Utility.dip2px(getContext(), 48);
         for (int i = 0; i< SIDE_BUTTON_COUNT; ++i) {
 
             try {
-                Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), drawable_id[i]);
-                Bitmap new_bitmap = Bitmap.createScaledBitmap(bitmap, size, size, true); // Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                //Drawable img = getContext().getResources().getDrawable(drawable_id[i]);
+                //Bitmap bitmap = ((BitmapDrawable)img).getBitmap(); // BitmapFactory.decodeResource(getContext().getResources(), drawable_id[i]);
+                Bitmap new_bitmap = Bitmap.createScaledBitmap(Utility.DrawableToBitmap(getContext().getResources().getDrawable(drawable_id[i])), size, size, true); // Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                 side_buttons[i] = new SideButton(getContext(), new BitmapDrawable(getContext().getResources(), new_bitmap));
             } catch (Exception e) {
                 e.printStackTrace();
