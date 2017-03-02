@@ -23,6 +23,8 @@ public class SideBar extends CFloatView {
     public SideBar(Context context) {
         super(context);
 
+        sidebar_alpha = context.getSharedPreferences(context.getString(R.string.pref_name), MODE_MULTI_PROCESS).
+                getFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), Float.parseFloat(DefaultPreference.BUTTON_TRANSPARENT.getDefaultValue()));
         createDrawable();
         createLayoutParams();
         createSideButton();
