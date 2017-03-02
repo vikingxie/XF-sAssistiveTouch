@@ -10,8 +10,22 @@ import android.view.WindowManager;
 //public class SideButton extends ImageView implements IFloatView {
 public class SideButton extends CFloatView {
     static final String TAG = "SideButton";
-    public SideButton(Context context, Drawable drawable) {
+    private ISideButtonAction action = null;
+    public SideButton(Context context, Drawable drawable, ISideButtonAction action) {
         super(context);
         setImageDrawable(drawable);
+        this.action = action;
+    }
+
+    public void action() {
+        action.action();
+    }
+
+    public boolean within(int x, int y) {
+        int w = getDrawable().getMinimumWidth();
+        int h = getDrawable().getMinimumHeight();
+        WindowManager.LayoutParams para = getLayoutParams();
+
+        return para.x <= x && x <= para.x + w && para.y <= y && y <= para.y + h;
     }
 }

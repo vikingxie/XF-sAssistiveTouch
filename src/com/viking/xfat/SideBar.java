@@ -69,18 +69,43 @@ public class SideBar extends CFloatView {
 
     private void createSideButton() {
         int[] drawable_id = {R.drawable.side_button_home, R.drawable.side_button_recents, R.drawable.side_button_lock};
+        ISideButtonAction[] actions = {action_home, action_recents, action_lock};
         int size = Utility.DIP2PX(getContext(), 48);
         for (int i = 0; i< SIDE_BUTTON_COUNT; ++i) {
-
             try {
                 Bitmap bitmap = Bitmap.createScaledBitmap(Utility.DrawableToBitmap(getContext().getResources().getDrawable(drawable_id[i])), size, size, true);
-                side_buttons[i] = new SideButton(getContext(), new BitmapDrawable(getContext().getResources(), bitmap));
+                side_buttons[i] = new SideButton(getContext(), new BitmapDrawable(getContext().getResources(), bitmap), actions[i]);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     }
+
+    private ISideButtonAction action_home = new ISideButtonAction() {
+        @Override
+        public void action() {
+            Utility.GoHome(getContext());
+        }
+    };
+
+    private ISideButtonAction action_recents = new ISideButtonAction() {
+        @Override
+        public void action() {
+            Utility.ToggleRecentApps(getContext());
+        }
+    };
+
+    private ISideButtonAction action_lock = new ISideButtonAction() {
+        @Override
+        public void action() {
+            Context context = getContext();
+            if (context.getSharedPreferences(context.getString(R.string.pref_name), MODE_MULTI_PROCESS).
+                    getBoolean(DefaultPreference.HOME_BEFORE_LOCK.getKey(), Boolean.parseBoolean(DefaultPreference.HOME_BEFORE_LOCK.getDefaultValue()))) {
+                Utility.GoHome(context);
+            }
+            Utility.LockScreen(context);
+        }
+    };
 
     private class TouchListener implements OnTouchListener {
         private GestureDetector gesture_detector = null;
@@ -93,31 +118,10 @@ public class SideBar extends CFloatView {
         public boolean onTouch(View v, MotionEvent event) {
             switch (event.getAction()) {
                 case  MotionEvent.ACTION_UP:
-                    float x = event.getRawX(), y = event.getRawY() - status_bar_height;
-                    for (int i=0; i<SIDE_BUTTON_COUNT; ++i) {
-                        WindowManager.LayoutParams para = side_buttons[i].getLayoutParams();
-                        int w = side_buttons[i].getDrawable().getMinimumWidth();
-                        int h = side_buttons[i].getDrawable().getMinimumHeight();
-                        if (para.x <= x && x <= para.x + w && para.y <= y && y <= para.y + h) {
-                            Log.d(TAG, "Up in " + i);
-                            Context context = SideBar.this.getContext();
-                            switch (i) {
-                                case 0:
-                                    Utility.GoHome(context);
-                                    break;
-                                case 1:
-                                    Utility.ToggleRecentApps(context);
-                                    break;
-                                case 2:
-                                    if (context.getSharedPreferences(context.getString(R.string.pref_name), MODE_MULTI_PROCESS).
-                                            getBoolean(DefaultPreference.HOME_BEFORE_LOCK.getKey(), Boolean.parseBoolean(DefaultPreference.HOME_BEFORE_LOCK.getDefaultValue()))) {
-                                        Utility.GoHome(context);
-                                    }
-                                    Utility.LockScreen(context);
-                                    break;
-                                default:
-                                    break;
-                            }
+                    int x = (int) (event.getRawX() + 0.5), y = (int) (event.getRawY() - status_bar_height + 0.5);
+                    for (SideButton button : side_buttons) {
+                        if (button.within(x, y)) {
+                            button.action();
                             break;
                         }
                     }
