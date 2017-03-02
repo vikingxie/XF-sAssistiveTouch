@@ -18,6 +18,7 @@ public class SideBar extends CFloatView {
     private float sidebar_alpha = 0.0f;
     private int sidebar_height;
     private int sidebar_width;
+    private OrientationEventListener orientation_listener = null;
     private SideButton[] side_buttons = new SideButton[SIDE_BUTTON_COUNT];
 
     public SideBar(Context context) {
@@ -29,6 +30,19 @@ public class SideBar extends CFloatView {
         createLayoutParams();
         createSideButton();
         setOnTouchListener(new TouchListener(context));
+        orientation_listener = new SideBar.OrientationListener(context);
+    }
+
+    @Override
+    public void show() {
+        super.show();
+        orientation_listener.enable();
+    }
+
+    @Override
+    public void hide() {
+        orientation_listener.disable();
+        super.hide();
     }
 
     private void createDrawable() {
@@ -46,8 +60,8 @@ public class SideBar extends CFloatView {
         layout_params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         layout_params.format = PixelFormat.RGBA_8888;
         layout_params.gravity = Gravity.TOP | Gravity.START;
-        layout_params.x = 0;
-        layout_params.y = frame_size.y; // / 2 - sidebar_height / 2;
+        layout_params.x = frame_size.x;
+        layout_params.y = frame_size.y;
         layout_params.width = WindowManager.LayoutParams.WRAP_CONTENT;
         layout_params.height = WindowManager.LayoutParams.WRAP_CONTENT;
         layout_params.alpha = sidebar_alpha;
@@ -59,10 +73,8 @@ public class SideBar extends CFloatView {
         for (int i = 0; i< SIDE_BUTTON_COUNT; ++i) {
 
             try {
-                //Drawable img = getContext().getResources().getDrawable(drawable_id[i]);
-                //Bitmap bitmap = ((BitmapDrawable)img).getBitmap(); // BitmapFactory.decodeResource(getContext().getResources(), drawable_id[i]);
-                Bitmap new_bitmap = Bitmap.createScaledBitmap(Utility.DrawableToBitmap(getContext().getResources().getDrawable(drawable_id[i])), size, size, true); // Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                side_buttons[i] = new SideButton(getContext(), new BitmapDrawable(getContext().getResources(), new_bitmap));
+                Bitmap bitmap = Bitmap.createScaledBitmap(Utility.DrawableToBitmap(getContext().getResources().getDrawable(drawable_id[i])), size, size, true);
+                side_buttons[i] = new SideButton(getContext(), new BitmapDrawable(getContext().getResources(), bitmap));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -124,7 +136,7 @@ public class SideBar extends CFloatView {
         private float step_r = 1.2f;
         private static final double ANGLE_CENTER = Math.PI / 4;
         private static final double ANGLE_STEP = Math.PI / 6;
-        private double[] step_x = {step_r * Math.cos(ANGLE_CENTER), step_r * Math.cos(ANGLE_CENTER + ANGLE_STEP), step_r * Math.cos(ANGLE_CENTER - ANGLE_STEP)};
+        private double[] step_x = {-step_r * Math.cos(ANGLE_CENTER), -step_r * Math.cos(ANGLE_CENTER + ANGLE_STEP), -step_r * Math.cos(ANGLE_CENTER - ANGLE_STEP)};
         private double[] step_y = {-step_r * Math.sin(ANGLE_CENTER), -step_r * Math.sin(ANGLE_CENTER + ANGLE_STEP), -step_r * Math.sin(ANGLE_CENTER - ANGLE_STEP)};
         private float step_start = Utility.dip2px(getContext(), 24);
         private float step_stop = Utility.dip2px(getContext(), 120) / step_r;
@@ -171,6 +183,29 @@ public class SideBar extends CFloatView {
 
         @Override
         public void onLongPress(MotionEvent e) {
+        }
+    }
+
+    private class OrientationListener extends OrientationEventListener {
+
+        private int screen_rotation=Surface.ROTATION_0;
+
+        public OrientationListener(Context context) {
+            super(context);
+            screen_rotation = window_manager.getDefaultDisplay().getRotation();
+        }
+
+        @Override
+        public void onOrientationChanged(int orientation) {
+            int rotation = window_manager.getDefaultDisplay().getRotation();
+            if (screen_rotation != rotation) {
+                Point frame_size = new Point();
+                window_manager.getDefaultDisplay().getSize(frame_size);
+                layout_params.x = frame_size.x;
+                layout_params.y = frame_size.y;
+                update();
+                screen_rotation = rotation;
+            }
         }
     }
 }
