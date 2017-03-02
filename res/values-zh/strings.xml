@@ -6,6 +6,8 @@
         \n双击: 锁屏
         \n长按: 任务管理器 (启用 设置-无障碍(辅助功能)-XF\'s Assistive Touch)
         \n
+        \n侧边栏模式: 从右下角滑动到图标位置后抬起手指
+        \n
         \n注意: 卸载前先停止服务
         \n
     </string>
@@ -15,5 +17,5 @@
     <string name="cancel">取消</string>
     <string name="home_before_lock">锁屏前先返回主屏</string>
     <string name="acc_service">使能长按打开任务管理器</string>
-    <string name="sidebar">侧边栏</string>
+    <string name="sidebar">侧边栏模式</string>
 </resources>

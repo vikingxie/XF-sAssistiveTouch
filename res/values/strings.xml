@@ -7,6 +7,8 @@
         \nDouble click: Lock screen
         \nLong press: Task manager (Enable Setting-Accessibility-XF\'s Assistive Touch)
         \n
+        \nSidebar mode: Slide from lower right corner then release at icon location
+        \n
         \nNote: Stop service before uninstall
         \n
     </string>
@@ -17,5 +19,5 @@
     <string name="home_before_lock">Go home before lock screen</string>
     <string name="acc_service">Enable long press to open recent apps</string>
     <string name="pref_name">pref</string>
-    <string name="sidebar">Sidebar</string>
+    <string name="sidebar">Sidebar mode</string>
 </resources>
