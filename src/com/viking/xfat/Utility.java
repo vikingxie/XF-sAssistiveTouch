@@ -63,12 +63,12 @@ public class Utility {
         return status_bar_height;
     }
 
-    public static int DIP2PX(Context context, float dpValue) {
+    public static int DIP2PX(Context context, double dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
 
-    public static int PX2DIP(Context context, float pxValue) {
+    public static int PX2DIP(Context context, double pxValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
     }
@@ -197,16 +197,6 @@ public class Utility {
         }
 
         return false;
-    }
-
-    public static int dip2px(Context context, double dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
-    }
-
-    public static int px2dip(Context context, double pxValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (pxValue / scale + 0.5f);
     }
 
     public static Bitmap DrawableToBitmap(Drawable drawable) {

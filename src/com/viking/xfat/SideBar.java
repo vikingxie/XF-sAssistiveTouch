@@ -69,7 +69,7 @@ public class SideBar extends CFloatView {
 
     private void createSideButton() {
         int[] drawable_id = {R.drawable.side_button_home, R.drawable.side_button_recents, R.drawable.side_button_lock};
-        int size = Utility.dip2px(getContext(), 48);
+        int size = Utility.DIP2PX(getContext(), 48);
         for (int i = 0; i< SIDE_BUTTON_COUNT; ++i) {
 
             try {
@@ -138,8 +138,8 @@ public class SideBar extends CFloatView {
         private static final double ANGLE_STEP = Math.PI / 6;
         private double[] step_x = {-step_r * Math.cos(ANGLE_CENTER), -step_r * Math.cos(ANGLE_CENTER + ANGLE_STEP), -step_r * Math.cos(ANGLE_CENTER - ANGLE_STEP)};
         private double[] step_y = {-step_r * Math.sin(ANGLE_CENTER), -step_r * Math.sin(ANGLE_CENTER + ANGLE_STEP), -step_r * Math.sin(ANGLE_CENTER - ANGLE_STEP)};
-        private float step_start = Utility.dip2px(getContext(), 24);
-        private float step_stop = Utility.dip2px(getContext(), 120) / step_r;
+        private float step_start = Utility.DIP2PX(getContext(), 24);
+        private float step_stop = Utility.DIP2PX(getContext(), 120) / step_r;
 
         @Override
         public boolean onDown(MotionEvent e) {
