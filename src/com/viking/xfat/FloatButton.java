@@ -12,17 +12,14 @@ import android.widget.ImageView;
 
 import static android.content.Context.MODE_MULTI_PROCESS;
 
-public class FloatButton extends ImageView implements IFloatView {
+public class FloatButton extends CFloatView {
     private static final long animation_frame_delay = 50; // ms
 
-    private int status_bar_height = 0;
     private float button_alpha;
     private int button_height, button_width;
     private float stick_distance_x, stick_distance_y;
     private boolean button_scrolled = false;
     private Point virtual_coordinate = new Point();
-    private WindowManager.LayoutParams layout_params = null;
-    private WindowManager window_manager = null;
     private ValueAnimator fadeout_animation = null;
     private TimeAnimator stick_animation = null;
     private int stick_animation_speed = 0;
@@ -33,10 +30,8 @@ public class FloatButton extends ImageView implements IFloatView {
     public FloatButton(Context context) {
         super(context);
         this.context = context;
-        status_bar_height = Utility.GetStatusBarHeight(context);
         button_alpha = context.getSharedPreferences(context.getString(R.string.pref_name), MODE_MULTI_PROCESS).
                 getFloat(DefaultPreference.BUTTON_TRANSPARENT.getKey(), Float.parseFloat(DefaultPreference.BUTTON_TRANSPARENT.getDefaultValue()));
-        window_manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         createDrawable();
         createLayoutParams();
         createAnimation();
@@ -46,7 +41,7 @@ public class FloatButton extends ImageView implements IFloatView {
     }
 
     public void show() {
-        window_manager.addView(this, layout_params);
+        super.show();
         stick_animation.start(); //fadeout_animation.start();
         orientation_listener.enable();
         context.getSharedPreferences(context.getString(R.string.pref_name), MODE_MULTI_PROCESS).registerOnSharedPreferenceChangeListener(preference_listener);
@@ -57,7 +52,7 @@ public class FloatButton extends ImageView implements IFloatView {
         orientation_listener.disable();
         stick_animation.cancel();
         fadeout_animation.cancel();
-        window_manager.removeView(this);
+        super.hide();
     }
 
     public void updateLayoutParams(Point coordinate) {
@@ -77,17 +72,17 @@ public class FloatButton extends ImageView implements IFloatView {
 
     public void updateView(Point coordinate) {
         updateLayoutParams(coordinate);
-        window_manager.updateViewLayout(FloatButton.this, layout_params);
+        update();
     }
 
     public void updateView(Point coordinate, float alpha) {
         updateLayoutParams(coordinate, alpha);
-        window_manager.updateViewLayout(FloatButton.this, layout_params);
+        update();
     }
 
     public void updateView(float alpha) {
         updateLayoutParams(alpha);
-        window_manager.updateViewLayout(FloatButton.this, layout_params);
+        update();
     }
 
     private void createDrawable() {
@@ -100,7 +95,6 @@ public class FloatButton extends ImageView implements IFloatView {
     }
 
     private void createLayoutParams() {
-        layout_params = new WindowManager.LayoutParams();
         layout_params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         layout_params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         layout_params.format = PixelFormat.RGBA_8888;
