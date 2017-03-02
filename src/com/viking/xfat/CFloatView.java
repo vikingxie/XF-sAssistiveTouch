@@ -41,7 +41,7 @@ public class CFloatView extends ImageView implements IFloatView {
             window_manager.addView(this, layout_params);
             show = true;
         } else {
-            window_manager.updateViewLayout(this, layout_params);
+            update();
         }
     }
 
@@ -50,6 +50,10 @@ public class CFloatView extends ImageView implements IFloatView {
             window_manager.removeView(this);
             show = false;
         }
+    }
+
+    public void update() {
+        window_manager.updateViewLayout(this, layout_params);
     }
 
     public LayoutParams getLayoutParams() {
