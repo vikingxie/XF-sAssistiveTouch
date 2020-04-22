@@ -143,7 +143,7 @@ public class SideBar extends CFloatView {
         private double[] step_x = {-step_r * Math.cos(ANGLE_CENTER), -step_r * Math.cos(ANGLE_CENTER + ANGLE_STEP), -step_r * Math.cos(ANGLE_CENTER - ANGLE_STEP)};
         private double[] step_y = {-step_r * Math.sin(ANGLE_CENTER), -step_r * Math.sin(ANGLE_CENTER + ANGLE_STEP), -step_r * Math.sin(ANGLE_CENTER - ANGLE_STEP)};
         private float step_start = Utility.DIP2PX(getContext(), 24);
-        private float step_stop = Utility.DIP2PX(getContext(), 120) / step_r;
+        private float step_stop = Utility.DIP2PX(getContext(), 160) / step_r;
 
         @Override
         public boolean onDown(MotionEvent e) {
